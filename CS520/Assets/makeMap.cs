@@ -26,7 +26,25 @@ public class makeMap : MonoBehaviour {
         tw = new StreamWriter("output.txt");
         maxPath = 100;
         map = new mapSquare[numRows, numCols];
-    
+
+        //generate map
+        generateUnblocked();
+        generateStartGoal();
+        generatePartiallyBlocked();
+        generateHighwayPoints();
+        assignEachPointOnHighway();
+        generateBlocked();
+
+        //display squares
+        displaySquares(); 
+
+        //convert to text
+        convertToText();
+    }
+
+    //generate all unblocked squares: all in the beginning
+    void generateUnblocked()
+    {
         //initialize the map to unblocked squares
         for (int r = 0; r < numRows; r++)
         {
@@ -36,7 +54,11 @@ public class makeMap : MonoBehaviour {
                 //map[r, c].type = 1;
             }
         }
+    }
 
+    //generate the start and goal locations
+    void generateStartGoal()
+    {
         //generate start and goal states
 
         //start
@@ -94,10 +116,48 @@ public class makeMap : MonoBehaviour {
 
             goalVector = new Vector2(goalx, goaly);
         }
+    }
 
+    //generate all partially blocked squares
+    void generatePartiallyBlocked()
+    {
+        //place partially blocked squares by randomly deciding on 8 coordinates
+        for (int i = 0; i < 8; i++)
+        {
+            float randx = (numRows - 1) * Random.value;
+            float randz = (numCols - 1) * Random.value;
+            for (int x = (int)randx - 15; x <= randx + 15; x++)
+            {
+                for (int z = (int)randz - 15; z <= randz + 15; z++)
+                {
+                    //this is out of bounds
+                    if (x < 0 || x > (numRows - 1) || z < 0 || z > (numCols - 1))
+                    {
+                        continue;
+                    }
+                    //otherwise do probabilities
+                    else
+                    {
+                        float partiallyBlocked = Random.value;
+                        if (partiallyBlocked < .5)
+                        {
+                            map[x, z].type = 2;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
+    //generate the highway turning points so that can later can fill in what is between them
+    void generateHighwayPoints()
+    {
         int stoppingTime = 0;
-        
+
         //while we have not done all 4 paths
         int pathsDone = 0;
         int currentPathDone = 0;//1 done, 2 restart
@@ -115,7 +175,7 @@ public class makeMap : MonoBehaviour {
             //do 1 path
             //while still can do path:
             //-----------------------------------------------------do path-----------------------------------------------------
-            
+
             //-----------------------------------------------------do starting path component-----------------------------------------------------
             //first find starting point:
             Vector2 startHighway; //x,z
@@ -205,7 +265,7 @@ public class makeMap : MonoBehaviour {
                     {
                         //for 20 blocks move out
                         startHighway = new Vector2((int)startHighway.x + 20 - 1, (int)startHighway.y);
-                        int xCoord = (int)startHighway.x+20-1;
+                        int xCoord = (int)startHighway.x + 20 - 1;
                         int zCoord = (int)startHighway.y;
                         //if leave boundary:
                         if (xCoord < 0 || zCoord < 0 || xCoord >= numRows || zCoord >= numCols)
@@ -230,7 +290,7 @@ public class makeMap : MonoBehaviour {
                     {
                         //for 20 blocks move out
                         startHighway = new Vector2((int)startHighway.x - 20 + 1, (int)startHighway.y);
-                        int xCoord = (int)startHighway.x-20+1;
+                        int xCoord = (int)startHighway.x - 20 + 1;
                         int zCoord = (int)startHighway.y;
                         //if leave boundary:
                         if (xCoord < 0 || zCoord < 0 || xCoord >= numRows || zCoord >= numCols)
@@ -291,9 +351,10 @@ public class makeMap : MonoBehaviour {
                                 {
                                     currentPathDone = 1;
                                     //path done!!
-                                    currentPath.Add(new Vector2(xCoord, zCoord-1));
+                                    currentPath.Add(new Vector2(xCoord, zCoord - 1));
                                     break;
-                                }else
+                                }
+                                else
                                 {
                                     currentPathDone = 2;
                                     //restart path
@@ -306,7 +367,8 @@ public class makeMap : MonoBehaviour {
                         if (currentPathDone == 1)
                         {
                             break;
-                        }else if (currentPathDone == 2)
+                        }
+                        else if (currentPathDone == 2)
                         {
                             break;
                         }
@@ -323,7 +385,7 @@ public class makeMap : MonoBehaviour {
                             int xCoord = (int)startHighway.x;
                             int zCoord = (int)startHighway.y - i + 1;
                             //if it is a highway, then restart
-                            if(checkIfHighway(xCoord, zCoord))
+                            if (checkIfHighway(xCoord, zCoord))
                             {
                                 currentPathDone = 2;
                                 //restart path
@@ -337,7 +399,7 @@ public class makeMap : MonoBehaviour {
                                 {
                                     currentPathDone = 1;
                                     //path done!!
-                                    currentPath.Add(new Vector2(xCoord, zCoord+1));
+                                    currentPath.Add(new Vector2(xCoord, zCoord + 1));
                                     break;
                                 }
                                 else
@@ -383,7 +445,7 @@ public class makeMap : MonoBehaviour {
                                 {
                                     currentPathDone = 1;
                                     //path done!!
-                                    currentPath.Add(new Vector2(xCoord-1, zCoord));
+                                    currentPath.Add(new Vector2(xCoord - 1, zCoord));
                                     break;
                                 }
                                 else
@@ -429,7 +491,7 @@ public class makeMap : MonoBehaviour {
                                 {
                                     currentPathDone = 1;
                                     //path done!!
-                                    currentPath.Add(new Vector2(xCoord+1, zCoord));
+                                    currentPath.Add(new Vector2(xCoord + 1, zCoord));
                                     break;
                                 }
                                 else
@@ -456,7 +518,7 @@ public class makeMap : MonoBehaviour {
                 else if (direction2 < .8f)
                 {
                     //if direction is up or down, then we move right
-                    if (direction ==2||direction==3)
+                    if (direction == 2 || direction == 3)
                     {
                         //for 20 blocks move out
                         for (int i = 1; i <= 20; i++)
@@ -478,7 +540,7 @@ public class makeMap : MonoBehaviour {
                                 {
                                     currentPathDone = 1;
                                     //path done!!
-                                    currentPath.Add(new Vector2(xCoord, zCoord-1));
+                                    currentPath.Add(new Vector2(xCoord, zCoord - 1));
                                     break;
                                 }
                                 else
@@ -503,7 +565,7 @@ public class makeMap : MonoBehaviour {
                         currentPath.Add(startHighway);
                     }
                     //if direction is left or right, then we move up
-                    if (direction ==0||direction==1)
+                    if (direction == 0 || direction == 1)
                     {
                         //for 20 blocks move out
                         for (int i = 1; i <= 20; i++)
@@ -526,7 +588,7 @@ public class makeMap : MonoBehaviour {
                                 {
                                     currentPathDone = 1;
                                     //path done!!
-                                    currentPath.Add(new Vector2(xCoord+1, zCoord));
+                                    currentPath.Add(new Vector2(xCoord + 1, zCoord));
                                     break;
                                 }
                                 else
@@ -550,7 +612,7 @@ public class makeMap : MonoBehaviour {
                     }
                     //otherwise start over
                     //break;
-                       
+
                 }
                 //move perpendicular in one direction: down or left
                 else
@@ -579,7 +641,7 @@ public class makeMap : MonoBehaviour {
                                 {
                                     currentPathDone = 1;
                                     //path done!!
-                                    currentPath.Add(new Vector2(xCoord, zCoord+1));
+                                    currentPath.Add(new Vector2(xCoord, zCoord + 1));
                                     break;
                                 }
                                 else
@@ -625,7 +687,7 @@ public class makeMap : MonoBehaviour {
                                 {
                                     currentPathDone = 1;
                                     //path done!!
-                                    currentPath.Add(new Vector2(xCoord-1, zCoord));
+                                    currentPath.Add(new Vector2(xCoord - 1, zCoord));
                                     break;
                                 }
                                 else
@@ -653,11 +715,11 @@ public class makeMap : MonoBehaviour {
             }
 
             //if current path needs to restart or isn't done, restart
-            if (currentPathDone == 2||currentPathDone==0)
+            if (currentPathDone == 2 || currentPathDone == 0)
             {
                 continue;
             }
-            
+
             //-----------------------------------------------------finish other direction components---------------------------------------------------
 
             pathsDone++;
@@ -665,11 +727,11 @@ public class makeMap : MonoBehaviour {
             currentPath = new ArrayList();
 
         }
+    }
 
-       
-
-        //TEMPORARY print arraylist--------------------------------------------
-
+    //fills in all points in between the points generated by generateHighwayPoints
+    void assignEachPointOnHighway()
+    {
         Debug.Log("start printing---------------------------------------");
         int countPoints = 0;
         for (int i = 0; i < paths.Count; i++)
@@ -749,43 +811,12 @@ public class makeMap : MonoBehaviour {
 
             }
         }
-        
-        //--------------------------------------------------------
 
+    }
 
-        //go through paths and fill mapSquares with types
-
-        //place partially blocked squares by randomly deciding on 8 coordinates
-        for (int i = 0; i < 8; i++)
-        {
-            float randx = (numRows - 1) * Random.value;
-            float randz = (numCols - 1) * Random.value;
-            for (int x = (int)randx - 15; x <= randx + 15; x++)
-            {
-                for (int z = (int)randz - 15; z <= randz + 15; z++)
-                {
-                    //this is out of bounds
-                    if (x < 0 || x > (numRows - 1) || z < 0 || z > (numCols - 1))
-                    {
-                        continue;
-                    }
-                    //otherwise do probabilities
-                    else
-                    {
-                        float partiallyBlocked = Random.value;
-                        if (partiallyBlocked < .5)
-                        {
-                            map[x, z].type = 2;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-                }
-            }
-        }
-
+    //generate all blocked squares
+    void generateBlocked()
+    {
         //place blocked squares by randomly selecting non highway cells
         int numBlocked = 0;
         while (numBlocked < 3840)
@@ -799,6 +830,11 @@ public class makeMap : MonoBehaviour {
             }
         }
 
+    }
+
+    //display all squares in unity
+    void displaySquares()
+    {
         //go through map and place the right squares in the right places
         for (int r = 0; r < numRows; r++)
         {
@@ -877,9 +913,59 @@ public class makeMap : MonoBehaviour {
                 }
             }
         }
-
-        convertToText();
     }
+
+    //generate the text file
+    void convertToText()
+    {
+        for (int i = 0; i < 120; i++)
+        {
+            for (int j = 0; j < 160; j++)
+            {
+                if (j != 0)
+                {
+                    tw.Write(",");
+                }
+                //tw.Write(map[i, j]);
+                if (map[i, j].typeHighway == 0)
+                {
+
+                    if (map[i, j].type == 2)
+                    {
+                        tw.Write("2");
+                    }
+                    else if (map[i, j].type == 1)
+                    {
+                        tw.Write("1");
+                    }
+                    else if (map[i, j].type == 0)
+                    {
+                        tw.Write("0");
+                    }
+                }
+                else
+                {
+                    if (map[i, j].type == 1)
+                    {
+                        tw.Write("a");
+                    }
+                    else if (map[i, j].type == 2)
+                    {
+                        tw.Write("b");
+                    }
+                    else
+                    {
+                        tw.Write("ERROR!");
+                    }
+                }
+
+            }
+            tw.WriteLine();
+        }
+
+    }
+
+    //helper methods
 
     //method that checks whether there is a highway in the point specified
     bool checkIfHighway(int x, int z)
@@ -945,52 +1031,5 @@ public class makeMap : MonoBehaviour {
         return false;
     }
 
-    void convertToText()
-    {
-        for (int i = 0; i < 120; i++)
-        {
-            for (int j = 0; j < 160; j++)
-            {
-                if (j != 0)
-                {
-                    tw.Write(",");
-                }
-                //tw.Write(map[i, j]);
-                if (map[i, j].typeHighway == 0)
-                {
-
-                    if (map[i, j].type == 2)
-                    {
-                        tw.Write("2");
-                    }
-                    else if (map[i, j].type == 1)
-                    {
-                        tw.Write("1");
-                    }
-                    else if (map[i, j].type == 0)
-                    {
-                        tw.Write("0");
-                    }
-                }
-                else
-                {
-                    if (map[i, j].type == 1)
-                    {
-                        tw.Write("a");
-                    }
-                    else if (map[i, j].type == 2)
-                    {
-                        tw.Write("b");
-                    }
-                    else
-                    {
-                        tw.Write("ERROR!");
-                    }
-                }
-                
-            }
-            tw.WriteLine();
-        }
-
-    }
+   
 }
