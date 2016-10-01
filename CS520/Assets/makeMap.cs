@@ -967,7 +967,8 @@ public class makeMap : MonoBehaviour {
                 else if (map[r, c].typeHighway == 2)
                 {
                     verticalHighway.SetActive(true);
-                    Object temp = Instantiate(verticalHighway, new Vector3(r, 0.5f, c), Quaternion.identity);
+                    Object temp = Instantiate(verticalHighway, new Vector3(r, 0.5f, c), Quaternion.AngleAxis(90, Vector3.up));
+           
                     verticalHighway.SetActive(false);
                 }
                 //3:_| upper left highway
