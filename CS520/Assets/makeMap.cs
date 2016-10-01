@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.IO;
 
 public class makeMap : MonoBehaviour {
 
@@ -14,9 +15,16 @@ public class makeMap : MonoBehaviour {
     public GameObject verticalHighway;
     public GameObject upperHighway;
     public GameObject leftHighway;
+    public int maxPath;
+
+    public ArrayList paths = new ArrayList();
+    public ArrayList currentPath = new ArrayList();
+    public TextWriter tw;
 
     // Use this for initialization
     void Start () {
+        tw = new StreamWriter("output.txt");
+        maxPath = 100;
         map = new mapSquare[numRows, numCols];
     
         //initialize the map to unblocked squares
@@ -29,45 +37,79 @@ public class makeMap : MonoBehaviour {
             }
         }
 
-        //place partially blocked squares by randomly deciding on 8 coordinates
-        for(int i=0; i < 8; i++)
+        //generate start and goal states
+
+        //start
+        int startx = (int)(39 * Random.value);
+        if (startx >= 20)
         {
-            float randx = (numRows-1) *Random.value;
-            float randz = (numCols-1) * Random.value;
-            for(int x=(int)randx-15; x<=randx+15; x++)
+            startx += 80;
+        }
+        int starty = (int)(39 * Random.value);
+        if (starty >= 20)
+        {
+            starty += 120;
+        }
+        Vector2 startVector = new Vector2(startx, starty);
+
+
+        //goal
+        int goalx = (int)(39 * Random.value);
+        if (goalx >= 20)
+        {
+            goalx += 80;
+        }
+        int goaly = (int)(39 * Random.value);
+        if (goaly >= 20)
+        {
+            goaly += 80;
+        }
+        Vector2 goalVector = new Vector2(goalx, goaly);
+        while ((int)((goalVector - startVector).magnitude) < 100)
+        {
+            startx = (int)(39 * Random.value);
+            if (startx >= 20)
             {
-                for (int z = (int)randz - 15; z <= randz + 15; z++)
-                {
-                    //this is out of bounds
-                    if (x < 0 || x > (numRows - 1) || z < 0 || z > (numCols - 1))
-                    {
-                        continue;
-                    }
-                    //otherwise do probabilities
-                    else
-                    {
-                        float partiallyBlocked = Random.value;
-                        if (partiallyBlocked < .5)
-                        {
-                            map[x, z].type = 2;
-                        }else
-                        {
-                            continue;
-                        }
-                    }
-                }
+                startx += 80;
             }
+
+            starty = (int)(39 * Random.value);
+            if (starty >= 20)
+            {
+                starty += 120;
+            }
+            startVector = new Vector2(startx, starty);
+
+            goalx = (int)(39 * Random.value);
+            if (goalx >= 20)
+            {
+                goalx += 80;
+            }
+
+            goaly = (int)(39 * Random.value);
+            if (goaly >= 20)
+            {
+                goaly += 80;
+            }
+
+            goalVector = new Vector2(goalx, goaly);
         }
 
-        //place highways
-        ArrayList paths = new ArrayList();
-        ArrayList currentPath = new ArrayList();
 
+        int stoppingTime = 0;
+        
         //while we have not done all 4 paths
         int pathsDone = 0;
         int currentPathDone = 0;//1 done, 2 restart
         while (pathsDone < 4)
         {
+            stoppingTime++;
+            if (stoppingTime == 10000)
+            {
+                break;
+            }
+
+
             currentPathDone = 0;
             currentPath.Clear();
             //do 1 path
@@ -98,7 +140,6 @@ public class makeMap : MonoBehaviour {
                 startHighway = new Vector2(numRows - 1, boundarySide - numCols - numRows - numRows + 4);
             }
             currentPath.Add(startHighway);
-            Debug.Log("adding starting point: " + startHighway);
             //so we have start position
             //map[(int)startHighway.x, (int)startHighway.y].typeA = 1;
             //now decide to which position this will go:
@@ -106,7 +147,6 @@ public class makeMap : MonoBehaviour {
             while (true)
             {
                 direction = (int)(Random.value * 3);
-                Debug.Log("direction:" + direction);
                 //right
                 if (direction == 0)
                 {
@@ -125,7 +165,6 @@ public class makeMap : MonoBehaviour {
                             break;
                         }
                         currentPath.Add(startHighway);
-                        Debug.Log("adding second point: " + startHighway);
                         break;
                     }
                     else
@@ -151,7 +190,6 @@ public class makeMap : MonoBehaviour {
                             break;
                         }
                         currentPath.Add(startHighway);
-                        Debug.Log("adding second point: "+startHighway);
                         break;
                     }
                     else
@@ -177,7 +215,6 @@ public class makeMap : MonoBehaviour {
                             break;
                         }
                         currentPath.Add(startHighway);
-                        Debug.Log("adding second point: " + startHighway);
                         break;
                     }
                     else
@@ -203,7 +240,6 @@ public class makeMap : MonoBehaviour {
                             break;
                         }
                         currentPath.Add(startHighway);
-                        Debug.Log("adding second point: " + startHighway);
                         break;
                     }
                     else
@@ -251,12 +287,11 @@ public class makeMap : MonoBehaviour {
                             if (xCoord < 0 || zCoord < 0 || xCoord >= numRows || zCoord >= numCols)
                             {
                                 //if count>100, we are good and path is done
-                                if (count >= 100)
+                                if (count >= maxPath)
                                 {
                                     currentPathDone = 1;
                                     //path done!!
                                     currentPath.Add(new Vector2(xCoord, zCoord-1));
-                                    Debug.Log("adding boundary point: " + new Vector2(xCoord, zCoord-1));
                                     break;
                                 }else
                                 {
@@ -277,7 +312,6 @@ public class makeMap : MonoBehaviour {
                         }
                         startHighway = new Vector2((int)startHighway.x, (int)startHighway.y + 20 - 1);
                         currentPath.Add(startHighway);
-                        Debug.Log("adding more points: " + startHighway);
                     }
                     //left
                     if (direction == 1)
@@ -299,12 +333,11 @@ public class makeMap : MonoBehaviour {
                             if (xCoord < 0 || zCoord < 0 || xCoord >= numRows || zCoord >= numCols)
                             {
                                 //if count>100, we are good and path is done
-                                if (count >= 100)
+                                if (count >= maxPath)
                                 {
                                     currentPathDone = 1;
                                     //path done!!
                                     currentPath.Add(new Vector2(xCoord, zCoord+1));
-                                    Debug.Log("adding boundary point: " + new Vector2(xCoord, zCoord+1));
                                     break;
                                 }
                                 else
@@ -325,7 +358,6 @@ public class makeMap : MonoBehaviour {
                         }
                         startHighway = new Vector2((int)startHighway.x, (int)startHighway.y - 20 + 1);
                         currentPath.Add(startHighway);
-                        Debug.Log("adding more points: " + startHighway);
                     }
                     //down
                     if (direction == 2)
@@ -347,12 +379,11 @@ public class makeMap : MonoBehaviour {
                             if (xCoord < 0 || zCoord < 0 || xCoord >= numRows || zCoord >= numCols)
                             {
                                 //if count>100, we are good and path is done
-                                if (count >= 100)
+                                if (count >= maxPath)
                                 {
                                     currentPathDone = 1;
                                     //path done!!
                                     currentPath.Add(new Vector2(xCoord-1, zCoord));
-                                    Debug.Log("adding boundary point: " + new Vector2(xCoord-1, zCoord));
                                     break;
                                 }
                                 else
@@ -373,7 +404,6 @@ public class makeMap : MonoBehaviour {
                         }
                         startHighway = new Vector2((int)startHighway.x + 20 - 1, (int)startHighway.y);
                         currentPath.Add(startHighway);
-                        Debug.Log("adding more points: " + startHighway);
                     }
                     //up
                     if (direction == 3)
@@ -395,12 +425,11 @@ public class makeMap : MonoBehaviour {
                             if (xCoord < 0 || zCoord < 0 || xCoord >= numRows || zCoord >= numCols)
                             {
                                 //if count>100, we are good and path is done
-                                if (count >= 100)
+                                if (count >= maxPath)
                                 {
                                     currentPathDone = 1;
                                     //path done!!
                                     currentPath.Add(new Vector2(xCoord+1, zCoord));
-                                    Debug.Log("adding boundary point: " + new Vector2(xCoord+1, zCoord));
                                     break;
                                 }
                                 else
@@ -421,7 +450,6 @@ public class makeMap : MonoBehaviour {
                         }
                         startHighway = new Vector2((int)startHighway.x - 20 + 1, (int)startHighway.y);
                         currentPath.Add(startHighway);
-                        Debug.Log("adding more points: " + startHighway);
                     }
                 }
                 //move perpendicular in one direction: up or right
@@ -446,12 +474,11 @@ public class makeMap : MonoBehaviour {
                             if (xCoord < 0 || zCoord < 0 || xCoord >= numRows || zCoord >= numCols)
                             {
                                 //if count>100, we are good and path is done
-                                if (count >= 100)
+                                if (count >= maxPath)
                                 {
                                     currentPathDone = 1;
                                     //path done!!
                                     currentPath.Add(new Vector2(xCoord, zCoord-1));
-                                    Debug.Log("adding boundary point: " + new Vector2(xCoord, zCoord-1));
                                     break;
                                 }
                                 else
@@ -474,7 +501,6 @@ public class makeMap : MonoBehaviour {
                         }
                         startHighway = new Vector2((int)startHighway.x, (int)startHighway.y + 20 - 1);
                         currentPath.Add(startHighway);
-                        Debug.Log("adding more points: " + startHighway);
                     }
                     //if direction is left or right, then we move up
                     if (direction ==0||direction==1)
@@ -496,12 +522,11 @@ public class makeMap : MonoBehaviour {
                             if (xCoord < 0 || zCoord < 0 || xCoord >= numRows || zCoord >= numCols)
                             {
                                 //if count>100, we are good and path is done
-                                if (count >= 100)
+                                if (count >= maxPath)
                                 {
                                     currentPathDone = 1;
                                     //path done!!
                                     currentPath.Add(new Vector2(xCoord+1, zCoord));
-                                    Debug.Log("adding boundary point: " + new Vector2(xCoord+1, zCoord));
                                     break;
                                 }
                                 else
@@ -522,10 +547,9 @@ public class makeMap : MonoBehaviour {
                         }
                         startHighway = new Vector2((int)startHighway.x - 20 + 1, (int)startHighway.y);
                         currentPath.Add(startHighway);
-                        Debug.Log("adding more points: " + startHighway);
                     }
                     //otherwise start over
-                    break;
+                    //break;
                        
                 }
                 //move perpendicular in one direction: down or left
@@ -551,12 +575,11 @@ public class makeMap : MonoBehaviour {
                             if (xCoord < 0 || zCoord < 0 || xCoord >= numRows || zCoord >= numCols)
                             {
                                 //if count>100, we are good and path is done
-                                if (count >= 100)
+                                if (count >= maxPath)
                                 {
                                     currentPathDone = 1;
                                     //path done!!
                                     currentPath.Add(new Vector2(xCoord, zCoord+1));
-                                    Debug.Log("adding boundary point: " + new Vector2(xCoord, zCoord+1));
                                     break;
                                 }
                                 else
@@ -577,7 +600,6 @@ public class makeMap : MonoBehaviour {
                         }
                         startHighway = new Vector2((int)startHighway.x, (int)startHighway.y - 20 + 1);
                         currentPath.Add(startHighway);
-                        Debug.Log("adding more points: " + startHighway);
                     }
                     //if direction is left or right, then we move down
                     if (direction == 0 || direction == 1)
@@ -599,12 +621,11 @@ public class makeMap : MonoBehaviour {
                             if (xCoord < 0 || zCoord < 0 || xCoord >= numRows || zCoord >= numCols)
                             {
                                 //if count>100, we are good and path is done
-                                if (count >= 100)
+                                if (count >= maxPath)
                                 {
                                     currentPathDone = 1;
                                     //path done!!
                                     currentPath.Add(new Vector2(xCoord-1, zCoord));
-                                    Debug.Log("adding boundary point: " + new Vector2(xCoord-1, zCoord));
                                     break;
                                 }
                                 else
@@ -625,10 +646,9 @@ public class makeMap : MonoBehaviour {
                         }
                         startHighway = new Vector2((int)startHighway.x + 20 - 1, (int)startHighway.y);
                         currentPath.Add(startHighway);
-                        Debug.Log("adding more points: " + startHighway);
                     }
                     //otherwise start over
-                    break;
+                    //break;
                 }
             }
 
@@ -646,12 +666,15 @@ public class makeMap : MonoBehaviour {
 
         }
 
+       
 
         //TEMPORARY print arraylist--------------------------------------------
 
+        Debug.Log("start printing---------------------------------------");
         int countPoints = 0;
         for (int i = 0; i < paths.Count; i++)
         {
+            Debug.Log("next path-------------------------");
             if (paths[i] != null)
             {
                 ArrayList temp = (ArrayList)paths[i];
@@ -660,10 +683,9 @@ public class makeMap : MonoBehaviour {
                 Vector2 currentPoint = previousPoint;
                 if (previousPoint == null)
                 {
-                    Debug.Log("next path-------------------------");
                     continue;
                 }
-                Debug.Log("1st point"+currentPoint);
+                Debug.Log("1st point" + currentPoint);
                 countPoints = 1;
                 //go through each point in temp
                 for (int j = 1; j < temp.Count; j++)
@@ -682,7 +704,7 @@ public class makeMap : MonoBehaviour {
                         int x = x1;
                         if (z1 < z2)
                         {
-                            for(int z=z1; z < z2; z++)
+                            for (int z = z1; z <= z2; z++)
                             {
                                 map[x, z].typeA = countPoints;
                                 map[x, z].typeHighway = 1;
@@ -691,7 +713,7 @@ public class makeMap : MonoBehaviour {
                         }
                         else
                         {
-                            for (int z = z2; z > z1; z--)
+                            for (int z = z2; z <= z1; z++)
                             {
                                 map[x, z].typeA = countPoints;
                                 map[x, z].typeHighway = 1;
@@ -703,18 +725,18 @@ public class makeMap : MonoBehaviour {
                     else
                     {
                         int z = z1;
-                        if (x1 <x2)
+                        if (x1 < x2)
                         {
-                            for (int x = x1; x < x2; x++)
+                            for (int x = x1; x <= x2; x++)
                             {
                                 map[x, z].typeA = countPoints;
-                                map[x, z].typeHighway =2;
+                                map[x, z].typeHighway = 2;
                                 countPoints++;
                             }
                         }
                         else
                         {
-                            for (int x = x2; x > x1; x--)
+                            for (int x = x2; x <= x1; x++)
                             {
                                 map[x, z].typeA = countPoints;
                                 map[x, z].typeHighway = 2;
@@ -726,30 +748,69 @@ public class makeMap : MonoBehaviour {
                 }
 
             }
-            Debug.Log("next path-------------------------");
         }
-
-        //Debug.Log(paths);
+        
         //--------------------------------------------------------
 
 
         //go through paths and fill mapSquares with types
-        
 
-        
+        //place partially blocked squares by randomly deciding on 8 coordinates
+        for (int i = 0; i < 8; i++)
+        {
+            float randx = (numRows - 1) * Random.value;
+            float randz = (numCols - 1) * Random.value;
+            for (int x = (int)randx - 15; x <= randx + 15; x++)
+            {
+                for (int z = (int)randz - 15; z <= randz + 15; z++)
+                {
+                    //this is out of bounds
+                    if (x < 0 || x > (numRows - 1) || z < 0 || z > (numCols - 1))
+                    {
+                        continue;
+                    }
+                    //otherwise do probabilities
+                    else
+                    {
+                        float partiallyBlocked = Random.value;
+                        if (partiallyBlocked < .5)
+                        {
+                            map[x, z].type = 2;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
 
+        //place blocked squares by randomly selecting non highway cells
+        int numBlocked = 0;
+        while (numBlocked < 3840)
+        {
+            int x = (int)((numRows - 1) * Random.value);
+            int z = (int)((numCols - 1) * Random.value);
+            if (map[x, z].typeHighway == 0)
+            {
+                map[x, z].type = 0;
+                numBlocked++;
+            }
+        }
 
         //go through map and place the right squares in the right places
-        for (int r =0; r< numRows; r++)
+        for (int r = 0; r < numRows; r++)
         {
-            for(int c=0; c< numCols; c++)
+            for (int c = 0; c < numCols; c++)
             {
                 if (map[r, c].type == 0)
                 {
                     blockedSquare.SetActive(true);
                     Object temp = Instantiate(blockedSquare, new Vector3(r, 0, c), Quaternion.identity);
                     blockedSquare.SetActive(false);
-                }else if (map[r, c].type == 1)
+                }
+                else if (map[r, c].type == 1)
                 {
                     unblockedSquare.SetActive(true);
                     Object temp = Instantiate(unblockedSquare, new Vector3(r, 0, c), Quaternion.identity);
@@ -762,7 +823,7 @@ public class makeMap : MonoBehaviour {
                     partiallyBlockedSquare.SetActive(false);
                 }
                 //place highways
-                if(map[r, c].typeHighway == 1)
+                if (map[r, c].typeHighway == 1)
                 {
                     horizontalHighway.SetActive(true);
                     Object temp = Instantiate(horizontalHighway, new Vector3(r, 0.5f, c), Quaternion.identity);
@@ -778,10 +839,10 @@ public class makeMap : MonoBehaviour {
                 else if (map[r, c].typeHighway == 3)
                 {
                     upperHighway.SetActive(true);
-                    Object temp = Instantiate(upperHighway, new Vector3(r, 0.5f, c-.25f), Quaternion.identity);
+                    Object temp = Instantiate(upperHighway, new Vector3(r, 0.5f, c - .25f), Quaternion.identity);
                     upperHighway.SetActive(false);
                     leftHighway.SetActive(true);
-                    Object temp2 = Instantiate(leftHighway, new Vector3(r+.25f, 0.5f, c), Quaternion.identity);
+                    Object temp2 = Instantiate(leftHighway, new Vector3(r + .25f, 0.5f, c), Quaternion.identity);
                     leftHighway.SetActive(false);
                 }
                 //4:|_ upper right highway
@@ -816,16 +877,120 @@ public class makeMap : MonoBehaviour {
                 }
             }
         }
-	}
-	
+
+        convertToText();
+    }
+
     //method that checks whether there is a highway in the point specified
     bool checkIfHighway(int x, int z)
     {
+        //go through paths, and see if this point is between any of the coords
+        for (int i = 0; i < paths.Count; i++)
+        {
+            if (paths[i] != null)
+            {
+                ArrayList temp = (ArrayList)paths[i];
+                //go through all points....
+                Vector2 previousPoint = (Vector2)temp[0];
+                Vector2 currentPoint = previousPoint;
+                if (previousPoint == null)
+                {
+                    continue;
+                }
+                //go through each point in temp
+                for (int j = 1; j < temp.Count; j++)
+                {
+                    previousPoint = currentPoint;
+                    currentPoint = (Vector2)temp[j];
+                    //connect previousPoint and currentPoint
+                    int x1 = (int)previousPoint.x;
+                    int z1 = (int)previousPoint.y;
+                    int x2 = (int)currentPoint.x;
+                    int z2 = (int)currentPoint.y;
+                    //if the x's are the same and the z's change: horizontal
+                    if (x1 < x2)
+                    {
+                        if (x >= x1 && x <= x2)
+                        {
+                            return true;
+                        }
+                    }else
+                    {
+                        if (x >= x2 && x <= x1)
+                        {
+                            return true;
+                        }
+                    }
+                    if (z1 < z2)
+                    {
+                        if (z >= z1 && z <= z2)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        if (z >= z2 && z <= z1)
+                        {
+                            return true;
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+
         return false;
     }
 
-    // Update is called once per frame
-    void Update () {
-	
-	}
+    void convertToText()
+    {
+        for (int i = 0; i < 120; i++)
+        {
+            for (int j = 0; j < 160; j++)
+            {
+                if (j != 0)
+                {
+                    tw.Write(",");
+                }
+                //tw.Write(map[i, j]);
+                if (map[i, j].typeHighway == 0)
+                {
+
+                    if (map[i, j].type == 2)
+                    {
+                        tw.Write("2");
+                    }
+                    else if (map[i, j].type == 1)
+                    {
+                        tw.Write("1");
+                    }
+                    else if (map[i, j].type == 0)
+                    {
+                        tw.Write("0");
+                    }
+                }
+                else
+                {
+                    if (map[i, j].type == 1)
+                    {
+                        tw.Write("a");
+                    }
+                    else if (map[i, j].type == 2)
+                    {
+                        tw.Write("b");
+                    }
+                    else
+                    {
+                        tw.Write("ERROR!");
+                    }
+                }
+                
+            }
+            tw.WriteLine();
+        }
+
+    }
 }

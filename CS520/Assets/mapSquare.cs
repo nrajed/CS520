@@ -5,9 +5,9 @@ public class mapSquare : MonoBehaviour {
     //public Vector3 position;
     public int type =0;
     //type:
-    //0:unblocked
-    //1:partially blocked
-    //2:blocked
+    //0:blocked
+    //1:unblocked
+    //2:partially blocked
     //if other types then typeA, typeB also apply
 
     public int typeHighway = 0;
