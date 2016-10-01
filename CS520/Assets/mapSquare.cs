@@ -19,15 +19,14 @@ public class mapSquare : MonoBehaviour {
     //6:   lower right highway
 
 
-    //for highways:
-    public int typeA = 0;
-    public int typeB = 0;
+    public int count = 0;
 
     public mapSquare()
     {
         type = 1;
         typeHighway = 0;
-        typeA = 0;
-        typeB = 0;
+        //typeA = 0;
+        //typeB = 0;
+        count = 0;
     }
 }
