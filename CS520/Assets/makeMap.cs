@@ -33,27 +33,38 @@ public class makeMap : MonoBehaviour {
     public ArrayList currentPath = new ArrayList();
     public StreamWriter tw;
 
+    //see if n was already pressed
+    int nOnce = 0;
+
     // Use this for initialization
     void Start () {
-        tw = new StreamWriter("output.txt");
         maxPath = 100;
         map = new mapSquare[numRows, numCols];
-
-        //generate map
-        generateUnblocked();
-        generateStartGoal();
-        generatePartiallyBlocked();
-        generateHighwayPoints();
-        assignEachPointOnHighway();
-        generateBlocked();
-
-        //display squares
-        displaySquares(); 
-
-        //convert to text
-        convertToText();
     }
 
+    void Update()
+    {
+        //make new map
+        if (Input.GetKey(KeyCode.N) && nOnce==0)
+        {
+            nOnce = 1;
+            tw = new StreamWriter("output.txt");
+
+            //generate map
+            generateUnblocked();
+            generateStartGoal();
+            generatePartiallyBlocked();
+            generateHighwayPoints();
+            assignEachPointOnHighway();
+            generateBlocked();
+
+            //display squares
+            displaySquares();
+
+            //convert to text
+            convertToText();
+        }
+    }
     //generate all unblocked squares: all in the beginning
     void generateUnblocked()
     {
@@ -1250,5 +1261,102 @@ public class makeMap : MonoBehaviour {
         return false;
     }
 
-   
+    //returns -1 if unblocked square is the neighbor
+   float findCost(int x, int z, int neighborX, int neighborZ)
+    {
+        float cost = 0;
+        //if blocked return error: -1
+        if (map[x, z].type == 0|| map[neighborX, neighborZ].type==0)
+        {
+            return -1;
+        }
+
+        //if you are unblocked
+        if (map[x, z].type == 1)
+        {
+            //options: unblocked, partially blocked, blocked, unblocked highway, partially blocked highway, diagonal for each
+            //unblocked
+            if (map[neighborX, neighborZ].type == 1)
+            {
+                //if diagonal:
+                if(x!=neighborX||z!= neighborZ)
+                {
+                    cost = Mathf.Sqrt(2);
+                }else
+                {
+                    cost = 1;
+                    if (map[x, z].typeHighway != 0 && map[neighborX, neighborZ].typeHighway != 0)
+                    {
+                        cost = .25f;
+                    }
+                    
+                }
+                return cost;
+            }
+            //partially blocked
+            if (map[neighborX, neighborZ].type == 2)
+            {
+                //if diagonal:
+                if (x != neighborX || z != neighborZ)
+                {
+                    cost = (Mathf.Sqrt(2) + Mathf.Sqrt(8)) / 2;
+                }
+                else
+                {
+                    cost = 1.5f;
+                    if (map[x, z].typeHighway != 0 && map[neighborX, neighborZ].typeHighway != 0)
+                    {
+                        cost = .325f;
+                    }
+                }
+                return cost;
+            }
+        }
+
+        //if you are partially blocked
+        if (map[x, z].type == 2)
+        {
+            //options: unblocked, partially blocked, blocked, unblocked highway, partially blocked highway, diagonal for each
+            //unblocked
+            if (map[neighborX, neighborZ].type == 1)
+            {
+                //if diagonal:
+                if (x != neighborX || z != neighborZ)
+                {
+                    cost = (Mathf.Sqrt(2) + Mathf.Sqrt(8)) / 2;
+
+                }
+                else
+                {
+                    cost = 1.5f;
+                    //check if highway
+                    if(map[x, z].typeHighway != 0&& map[neighborX, neighborZ].typeHighway!=0)
+                    {
+                        cost = .325f;
+                    }
+                }
+                return cost;
+            }
+            //partially blocked
+            if (map[neighborX, neighborZ].type == 2)
+            {
+                //if diagonal:
+                if (x != neighborX || z != neighborZ)
+                {
+                    cost = Mathf.Sqrt(8);
+                }
+                else
+                {
+                    cost = 2f;
+                    if (map[x, z].typeHighway != 0 && map[neighborX, neighborZ].typeHighway != 0)
+                    {
+                        cost = .25f;
+                    }
+                }
+                return cost;
+            }
+        }
+
+        return -1;
+    }
 }
