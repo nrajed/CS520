@@ -8,7 +8,7 @@ public class makeMap : MonoBehaviour {
     public int numCols=160;//160
 
     //matrix storage of all coordinates
-    mapSquare[,] map;
+    public mapSquare[,] map;
 
     //objects to create in unity
     public GameObject unblockedSquare;
@@ -22,6 +22,8 @@ public class makeMap : MonoBehaviour {
     //starting and goal locations
     Vector2 startLocation;
     Vector2 goalLocation;
+    public GameObject startObject;
+    public GameObject goalObject;
 
     //maximum size of paths(100)
     public int maxPath;
@@ -39,16 +41,16 @@ public class makeMap : MonoBehaviour {
     // Use this for initialization
     void Start () {
         maxPath = 100;
-        map = new mapSquare[numRows, numCols];
     }
 
     void Update()
     {
         //make new map
-        if (Input.GetKey(KeyCode.N) && nOnce==0)
+        if (Input.GetKey(KeyCode.N) && nOnce == 0)
         {
             nOnce = 1;
             tw = new StreamWriter("output.txt");
+            map = new mapSquare[numRows, numCols];
 
             //generate map
             generateUnblocked();
@@ -60,9 +62,16 @@ public class makeMap : MonoBehaviour {
 
             //display squares
             displaySquares();
+            updateStarterGoalSquares(startLocation, goalLocation);
 
             //convert to text
             convertToText();
+        }
+        //reload start and end location
+        if (Input.GetKey(KeyCode.R) && nOnce == 0)
+        {
+            generateStartGoal();
+            updateStarterGoalSquares(startLocation, goalLocation);
         }
     }
     //generate all unblocked squares: all in the beginning
@@ -1134,6 +1143,11 @@ public class makeMap : MonoBehaviour {
     }
 
     //helper methods
+    void updateStarterGoalSquares(Vector2 start, Vector2 goal)
+    {
+        startObject.transform.position = new Vector3(start.x, 0, start.y);
+        goalObject.transform.position = new Vector3(goal.x, 0, goal.y);
+    }
 
     //method that checks whether there is a highway in the point specified
     bool checkIfHighway(int x, int z)
@@ -1261,6 +1275,10 @@ public class makeMap : MonoBehaviour {
         return false;
     }
 
+
+
+    //FOR A*----------------------------------------------------------------------
+
     //returns -1 if unblocked square is the neighbor
    float findCost(int x, int z, int neighborX, int neighborZ)
     {
@@ -1358,5 +1376,106 @@ public class makeMap : MonoBehaviour {
         }
 
         return -1;
+    }
+
+    //rests any old path and visualizes new path
+    void visualizeResetPaths()
+    {
+        //input=array of path
+        //input=path object
+        //input=temporary path object arrayList
+        //this is temporary for input in future
+        //ArrayList path = new ArrayList();
+
+        //stores objects that were used to build path:
+        //ArrayList tempPathObjs = new ArrayList();
+
+        //delete all objects in the tempPathObjs
+        /*for(int i=0; i<tempPathObjs.Count;i++){
+            Destroy(tempPathObjs[i]);
+         }
+         tempPathObjs.Clear();
+        */
+
+        //Loop through whole path
+        /*
+        previous=path[0];
+        current=previous;
+
+        for(int i=0; i<path.Count; i++){
+         previous=current;
+         current=path[i];
+
+         //connect previous with current
+         //8 cases:
+         //upper left
+         if(previous.x-1==current.x&&previous.z-1==current.z){
+             angle=?;
+             pathObject.SetActive(true);
+             Object temp = Instantiate(pathObject, new Vector3(previous.x-.5, 0.55f, previous.z-.5), Quaternion.AngleAxis(angle, Vector3.up));
+             pathObject.SetActive(false);
+             tempPathObjs.Add(temp);
+         }
+         //upper
+         else if(previous.x-1==current.x&&previous.z==current.z){
+             angle=90;
+             pathObject.SetActive(true);
+             Object temp = Instantiate(pathObject, new Vector3(previous.x-.5, 0.55f, previous.z), Quaternion.AngleAxis(angle, Vector3.up));
+             pathObject.SetActive(false);
+             tempPathObjs.Add(temp);
+         }
+         //upper right
+         else if(previous.x-1==current.x&&previous.z+1==current.z){
+             angle=?;
+             pathObject.SetActive(true);
+             Object temp = Instantiate(pathObject, new Vector3(previous.x-.5, 0.55f, previous.z+.5), Quaternion.AngleAxis(angle, Vector3.up));
+             pathObject.SetActive(false);
+             tempPathObjs.Add(temp);
+         }
+         //left
+         else if(previous.x==current.x&&previous.z-1==current.z){
+             angle=0;
+             pathObject.SetActive(true);
+             Object temp = Instantiate(pathObject, new Vector3(previous.x, 0.55f, previous.z-.5), Quaternion.AngleAxis(angle, Vector3.up));
+             pathObject.SetActive(false);
+             tempPathObjs.Add(temp);
+         }
+         //right
+         else if(previous.x==current.x&&previous.z+1==current.z){
+             angle=0;
+             pathObject.SetActive(true);
+             Object temp = Instantiate(pathObject, new Vector3(previous.x, 0.55f, previous.z+.5), Quaternion.AngleAxis(angle, Vector3.up));
+             pathObject.SetActive(false);
+             tempPathObjs.Add(temp);
+         }
+         //lower left
+         else if(previous.x+1==current.x&&previous.z-1==current.z){
+             angle=?;
+             pathObject.SetActive(true);
+             Object temp = Instantiate(pathObject, new Vector3(previous.x+.5, 0.55f, previous.z-.5), Quaternion.AngleAxis(angle, Vector3.up));
+             pathObject.SetActive(false);
+             tempPathObjs.Add(temp);
+         }
+         //lower right
+         else if(previous.x+1==current.x&&previous.z+1==current.z){
+             angle=?;
+             pathObject.SetActive(true);
+             Object temp = Instantiate(pathObject, new Vector3(previous.x+.5, 0.55f, previous.z+.5), Quaternion.AngleAxis(angle, Vector3.up));
+             pathObject.SetActive(false);
+             tempPathObjs.Add(temp);
+         }
+         //lower
+         else if(previous.x+1==current.x&&previous.z==current.z){
+             angle=90;
+             pathObject.SetActive(true);
+             Object temp = Instantiate(pathObject, new Vector3(previous.x+.5, 0.55f, previous.z+.5), Quaternion.AngleAxis(angle, Vector3.up));
+             pathObject.SetActive(false);
+             tempPathObjs.Add(temp);
+         }
+
+
+        }
+
+        */
     }
 }

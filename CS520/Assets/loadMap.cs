@@ -5,7 +5,7 @@ using System.IO;
 public class loadMap : MonoBehaviour {
 
     public StreamReader sr;
-    mapSquare[,] map;
+    public mapSquare[,] map;
     int row;
     int column;
 
@@ -17,6 +17,10 @@ public class loadMap : MonoBehaviour {
     public GameObject verticalHighway;
     public GameObject upperHighway;
     public GameObject leftHighway;
+
+    //to display starting and goal squares
+    public GameObject startObject;
+    public GameObject goalObject;
 
     int lOnce = 0;
 
@@ -41,8 +45,17 @@ public class loadMap : MonoBehaviour {
         sr = new StreamReader("output.txt");
         if (sr != null)
         {
+            //get starting and ending locations:
             string startingSquare = sr.ReadLine();
             string endingSquare = sr.ReadLine();
+            startingSquare=startingSquare.Trim('(',')');
+            endingSquare = endingSquare.Trim('(', ')');
+            string[] startCoords = startingSquare.Split(',');
+            string[] endCoords = endingSquare.Split(',');
+            updateStarterGoalSquares(new Vector2(float.Parse(startCoords[0]), float.Parse(startCoords[1])), 
+                                    new Vector2(float.Parse(endCoords[0]), float.Parse(endCoords[1])));
+
+
             string partiallyBlockedSquared = sr.ReadLine();
             partiallyBlockedSquared = sr.ReadLine();
             partiallyBlockedSquared = sr.ReadLine();
@@ -188,6 +201,13 @@ public class loadMap : MonoBehaviour {
                 }
             }
         }
+    }
+
+    //helper methods
+    void updateStarterGoalSquares(Vector2 start, Vector2 goal)
+    {
+        startObject.transform.position = new Vector3(start.x, 0, start.y);
+        goalObject.transform.position = new Vector3(goal.x, 0, goal.y);
     }
 
 }

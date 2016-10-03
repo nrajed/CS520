@@ -18,6 +18,8 @@ public class mapSquare : MonoBehaviour {
     //5:   lower left highway
     //6:   lower right highway
 
+    //If theres A* algorithm path here?
+    //public int path = 0;
 
     public int count = 0;
 
