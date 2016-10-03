@@ -11,6 +11,51 @@ public class mapObject : MonoBehaviour {
     void Start () {
         Cursor.visible = true;
 
+        //tempt test
+       /* PriorityQueue fringe = new PriorityQueue();
+        fringe.Insert(new Vector2(2, 2), 2);
+        fringe.Insert(new Vector2(5, 5), 5);
+        fringe.Insert(new Vector2(3, 3), 3);
+        fringe.Insert(new Vector2(9, 9), 9);
+        fringe.Insert(new Vector2(6.9f, 6.9f), 6.9f);
+        fringe.Insert(new Vector2(11.2f, 11.2f), 11.2f);
+        fringe.Insert(new Vector2(4, 4), 4);
+        fringe.Insert(new Vector2(17, 17), 17);
+        fringe.Insert(new Vector2(10, 10), 10);
+        fringe.Insert(new Vector2(8, 8), 8);
+
+        Vector2 test = fringe.Pop();
+
+
+        fringe.Remove(new Vector2(6.9f, 6.9f));
+        fringe.Remove(new Vector2(3, 3));
+        fringe.Remove(new Vector2(11.2f, 11.2f));
+        fringe.Remove(new Vector2(4, 4));
+        fringe.Remove(new Vector2(2, 2));
+        fringe.Remove(new Vector2(60, 60));
+        fringe.Remove(new Vector2(17, 17));
+        fringe.Remove(new Vector2(10, 10));
+        fringe.Remove(new Vector2(5, 5));
+        fringe.Remove(new Vector2(9, 9));
+        fringe.Remove(new Vector2(8, 8));
+        fringe.Remove(new Vector2(8, 8));
+        fringe.Remove(new Vector2(8, 3));
+
+        fringe.Insert(new Vector2(2, 2), 2);
+         fringe.Pop();
+        fringe.Pop();
+        fringe.Pop();
+        fringe.Pop();
+        fringe.Pop();
+        fringe.Pop();
+        fringe.Pop();
+        fringe.Pop();
+        fringe.Pop();
+        fringe.Pop();
+        fringe.Pop();
+        fringe.Pop();
+
+        Debug.Log("done");*/
     }
 	
 	// Update is called once per frame
