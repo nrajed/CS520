@@ -223,6 +223,26 @@ public class AStarAlgorithm : MonoBehaviour {
 
     }
 
+	//For Part 2
+	void sequentialAStar() {
+		
+	}
+
+	//Helper Methods
+	int Key(Vector2 s, int i)
+	{
+		
+	}
+
+	void ExpandState(Vector2 s, int i)
+	{
+
+	}
+
+	void IntegratedHeuristicAStar() {
+	
+	}
+
     //finds cost given parent node(x,z) and neighbor node (neighborX, neighborZ)
     float findCost(int x, int z, int neighborX, int neighborZ)
     {
