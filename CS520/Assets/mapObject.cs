@@ -6,7 +6,7 @@ public class mapObject : MonoBehaviour {
 
     mapSquare[,] map;
     public Text displaySquareType;
-
+    Vector2 goalLocation;
     // Use this for initialization
     void Start () {
         Cursor.visible = true;
@@ -75,18 +75,19 @@ public class mapObject : MonoBehaviour {
                 if (map1 != null)
                 {
                     map = map1;
+                    goalLocation=transform.gameObject.GetComponent<loadMap>().goalLocation;
                 }
                 else
                 {
                     map = map2;
+                    goalLocation = transform.gameObject.GetComponent<makeMap>().goalLocation;
                 }
-                displaySquareType.text = ""+map[r, c].type;
+                float h1 = this.transform.gameObject.GetComponent<AStarAlgorithm>().h1(new Vector2(r, c), goalLocation);
+                displaySquareType.text = "g:"+map[r, c].g+"| h:"+h1 + "| f:" + (map[r, c].g+h1);
             }
 
         }
 
-
-       
 
 
     }

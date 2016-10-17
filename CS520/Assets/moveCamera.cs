@@ -11,8 +11,8 @@ public class moveCamera : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         Cursor.lockState = CursorLockMode.Confined;
     }
 
@@ -43,8 +43,16 @@ public class moveCamera : MonoBehaviour
 		if (Input.GetKey(KeyCode.D)) {
 			dir.x = 1;
 		}
+        if (Input.GetKey(KeyCode.Equals))
+        {
+            GetComponent<Camera>().orthographicSize= GetComponent<Camera>().orthographicSize-2;
+        }
+        if (Input.GetKey(KeyCode.Minus))
+        {
+            GetComponent<Camera>().orthographicSize= GetComponent<Camera>().orthographicSize+2;
+        }
 
-		Vector3 movement = Quaternion.Euler(0, Camera.main.transform.localEulerAngles.y, 0) * dir;
+        Vector3 movement = Quaternion.Euler(0, Camera.main.transform.localEulerAngles.y, 0) * dir;
 
         transform.Translate(movement * speed * Time.deltaTime, Space.World);
     }

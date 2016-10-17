@@ -18,17 +18,20 @@ public class mapSquare : MonoBehaviour {
     //5:   lower left highway
     //6:   lower right highway
 
-    //If theres A* algorithm path here?
-    //public int path = 0;
-
     public int count = 0;
+
+
+
+    //FOR A*-----------------------------------------
+    public Vector2 parent;
+    public float g;
+    //---------------------------------------------
 
     public mapSquare()
     {
         type = 1;
         typeHighway = 0;
-        //typeA = 0;
-        //typeB = 0;
         count = 0;
+
     }
 }

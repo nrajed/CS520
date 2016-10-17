@@ -21,12 +21,16 @@ public class loadMap : MonoBehaviour {
     //to display starting and goal squares
     public GameObject startObject;
     public GameObject goalObject;
+    public Vector2 startLocation;
+    public Vector2 goalLocation;
+
+    public Vector2[] centers;
 
     int lOnce = 0;
 
     // Use this for initialization
     void Start () {
-        
+        centers = new Vector2[8];
     }
 	
 	// Update is called once per frame
@@ -54,16 +58,41 @@ public class loadMap : MonoBehaviour {
             string[] endCoords = endingSquare.Split(',');
             updateStarterGoalSquares(new Vector2(float.Parse(startCoords[0]), float.Parse(startCoords[1])), 
                                     new Vector2(float.Parse(endCoords[0]), float.Parse(endCoords[1])));
-
+            startLocation = new Vector2(float.Parse(startCoords[0]), float.Parse(startCoords[1]));
+            goalLocation = new Vector2(float.Parse(endCoords[0]), float.Parse(endCoords[1]));
 
             string partiallyBlockedSquared = sr.ReadLine();
+            partiallyBlockedSquared= partiallyBlockedSquared.Trim('(', ')');
+            string[] centerXY = partiallyBlockedSquared.Split(',');
+            centers[0] = new Vector2(float.Parse(centerXY[0]), float.Parse(centerXY[1]));
             partiallyBlockedSquared = sr.ReadLine();
+            partiallyBlockedSquared = partiallyBlockedSquared.Trim('(', ')');
+            centerXY = partiallyBlockedSquared.Split(',');
+            centers[1] = new Vector2(float.Parse(centerXY[0]), float.Parse(centerXY[1]));
             partiallyBlockedSquared = sr.ReadLine();
+            partiallyBlockedSquared = partiallyBlockedSquared.Trim('(', ')');
+            centerXY = partiallyBlockedSquared.Split(',');
+            centers[2] = new Vector2(float.Parse(centerXY[0]), float.Parse(centerXY[1]));
             partiallyBlockedSquared = sr.ReadLine();
+            partiallyBlockedSquared = partiallyBlockedSquared.Trim('(', ')');
+            centerXY = partiallyBlockedSquared.Split(',');
+            centers[3] = new Vector2(float.Parse(centerXY[0]), float.Parse(centerXY[1]));
             partiallyBlockedSquared = sr.ReadLine();
+            partiallyBlockedSquared = partiallyBlockedSquared.Trim('(', ')');
+            centerXY = partiallyBlockedSquared.Split(',');
+            centers[4] = new Vector2(float.Parse(centerXY[0]), float.Parse(centerXY[1]));
             partiallyBlockedSquared = sr.ReadLine();
+            partiallyBlockedSquared = partiallyBlockedSquared.Trim('(', ')');
+            centerXY = partiallyBlockedSquared.Split(',');
+            centers[5] = new Vector2(float.Parse(centerXY[0]), float.Parse(centerXY[1]));
             partiallyBlockedSquared = sr.ReadLine();
+            partiallyBlockedSquared = partiallyBlockedSquared.Trim('(', ')');
+            centerXY = partiallyBlockedSquared.Split(',');
+            centers[6] = new Vector2(float.Parse(centerXY[0]), float.Parse(centerXY[1]));
             partiallyBlockedSquared = sr.ReadLine();
+            partiallyBlockedSquared = partiallyBlockedSquared.Trim('(', ')');
+            centerXY = partiallyBlockedSquared.Split(',');
+            centers[7] = new Vector2(float.Parse(centerXY[0]), float.Parse(centerXY[1]));
             string rowcolumn = sr.ReadLine();
             string[] rowscolumns = rowcolumn.Split(',');
              row = int.Parse(rowscolumns[0]);

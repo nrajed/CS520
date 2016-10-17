@@ -48,7 +48,7 @@ public class PriorityQueue : MonoBehaviour {
     //returns -1 if fringe size is 0
     public float getMin()
     {
-        if (values.Count != 0)
+        if (values.Count != 0&& values.Count != 1)
         {
             return (float)values[0];
         }
@@ -245,6 +245,23 @@ public class PriorityQueue : MonoBehaviour {
                 break;
             }
         }
+    }
+
+    public bool isEmpty()
+    {
+        if(getMin()==-1) {
+            return true;
+        }
+        return false;
+    }
+
+    public bool contains(Vector2 value)
+    {
+        if (values.Contains(value))
+        {
+            return true;
+        }
+        return false;
     }
 
 

@@ -4,8 +4,8 @@ using System.IO;
 
 public class makeMap : MonoBehaviour {
 
-    public int numRows=120;//120
-    public int numCols=160;//160
+    public int numRows=20;//120
+    public int numCols=20;//160
 
     //matrix storage of all coordinates
     public mapSquare[,] map;
@@ -20,8 +20,8 @@ public class makeMap : MonoBehaviour {
     public GameObject leftHighway;
 
     //starting and goal locations
-    Vector2 startLocation;
-    Vector2 goalLocation;
+    public Vector2 startLocation;
+    public Vector2 goalLocation;
     public GameObject startObject;
     public GameObject goalObject;
 
@@ -29,7 +29,7 @@ public class makeMap : MonoBehaviour {
     public int maxPath;
 
     //list of all centers of partially blocked squares
-    Vector2[] centerPartiallyBlocked = new Vector2[8];
+    public Vector2[] centerPartiallyBlocked = new Vector2[8];
 
     public ArrayList paths = new ArrayList();
     public ArrayList currentPath = new ArrayList();
@@ -41,7 +41,9 @@ public class makeMap : MonoBehaviour {
     // Use this for initialization
     void Start () {
         maxPath = 100;
-    }
+        numRows = 120;
+        numCols = 160;
+}
 
     void Update()
     {
@@ -49,12 +51,13 @@ public class makeMap : MonoBehaviour {
         if (Input.GetKey(KeyCode.N) && nOnce == 0)
         {
             nOnce = 1;
-            tw = new StreamWriter("output.txt");
+           
             map = new mapSquare[numRows, numCols];
 
             //generate map
             generateUnblocked();
             generateStartGoal();
+            updateStarterGoalSquares(startLocation, goalLocation);
             generatePartiallyBlocked();
             generateHighwayPoints();
             assignEachPointOnHighway();
@@ -62,17 +65,18 @@ public class makeMap : MonoBehaviour {
 
             //display squares
             displaySquares();
-            updateStarterGoalSquares(startLocation, goalLocation);
+            
 
             //convert to text
             convertToText();
         }
         //reload start and end location
-        if (Input.GetKey(KeyCode.R) && nOnce == 0)
+        if (Input.GetKey(KeyCode.R))
         {
             generateStartGoal();
             updateStarterGoalSquares(startLocation, goalLocation);
         }
+        
     }
     //generate all unblocked squares: all in the beginning
     void generateUnblocked()
@@ -92,64 +96,105 @@ public class makeMap : MonoBehaviour {
     void generateStartGoal()
     {
         //generate start and goal states
+       int startIsBlocked = 1;
+         int goalIsBlocked = 1;
 
-        //start
-        int startx = (int)(39 * Random.value);
-        if (startx >= 20)
+        mapSquare[,] maptemp;
+        mapSquare[,] map1 = transform.gameObject.GetComponent<loadMap>().map;
+        mapSquare[,] map2 = transform.gameObject.GetComponent<makeMap>().map;
+        if (map1 != null)
         {
-            startx += 80;
+            maptemp = map1;
         }
-        int starty = (int)(39 * Random.value);
-        if (starty >= 20)
+        else if (map2 != null)
         {
-            starty += 120;
+            maptemp = map2;
         }
-        Vector2 startVector = new Vector2(startx, starty);
-        startLocation = startVector;
-
-        //goal
-        int goalx = (int)(39 * Random.value);
-        if (goalx >= 20)
+        else
         {
-            goalx += 80;
-        }
-        int goaly = (int)(39 * Random.value);
-        if (goaly >= 20)
-        {
-            goaly += 80;
-        }
-        Vector2 goalVector = new Vector2(goalx, goaly);
-        while ((int)((goalVector - startVector).magnitude) < 100)
-        {
-            startx = (int)(39 * Random.value);
-            if (startx >= 20)
-            {
-                startx += 80;
-            }
-
-            starty = (int)(39 * Random.value);
-            if (starty >= 20)
-            {
-                starty += 120;
-            }
-            startVector = new Vector2(startx, starty);
-
-            goalx = (int)(39 * Random.value);
-            if (goalx >= 20)
-            {
-                goalx += 80;
-            }
-
-            goaly = (int)(39 * Random.value);
-            if (goaly >= 20)
-            {
-                goaly += 80;
-            }
-
-            goalVector = new Vector2(goalx, goaly);
+            return;
         }
 
-        goalLocation = goalVector;
+        while (startIsBlocked != 0 || goalIsBlocked != 0) {
+
+             startIsBlocked = 1;
+             goalIsBlocked = 1;
+
+             //start
+             int startx = (int)(39 * Random.value);
+             if (startx >= 20)
+             {
+                 startx += 80;
+             }
+             int starty = (int)(39 * Random.value);
+             if (starty >= 20)
+             {
+                 starty += 120;
+             }
+             Vector2 startVector = new Vector2(startx, starty);
+             startLocation = startVector;
+
+           
+
+            if (maptemp[(int)startLocation.x, (int)startLocation.y].type != 0)
+             {
+                Debug.Log("startlocation: type!=0 so unblocked");
+                Debug.Log("start.x:" + startLocation.x);
+                Debug.Log("start.y:" + startLocation.y);
+                startIsBlocked = 0;
+             }
+
+             //goal
+             int goalx = (int)(39 * Random.value);
+             if (goalx >= 20)
+             {
+                 goalx += 80;
+             }
+             int goaly = (int)(39 * Random.value);
+             if (goaly >= 20)
+             {
+                 goaly += 80;
+             }
+             Vector2 goalVector = new Vector2(goalx, goaly);
+             while ((int)((goalVector - startVector).magnitude) < 100)
+             {
+                 startx = (int)(39 * Random.value);
+                 if (startx >= 20)
+                 {
+                     startx += 80;
+                 }
+
+                 starty = (int)(39 * Random.value);
+                 if (starty >= 20)
+                 {
+                     starty += 120;
+                 }
+                 startVector = new Vector2(startx, starty);
+
+                 goalx = (int)(39 * Random.value);
+                 if (goalx >= 20)
+                 {
+                     goalx += 80;
+                 }
+
+                 goaly = (int)(39 * Random.value);
+                 if (goaly >= 20)
+                 {
+                     goaly += 80;
+                 }
+
+                 goalVector = new Vector2(goalx, goaly);
+             }
+
+             goalLocation = goalVector;
+             if (maptemp[(int)goalLocation.x, (int)goalLocation.y].type != 0)
+             {
+                Debug.Log("goalLocation: type!=0 so unblocked");
+                Debug.Log("goal.x:" + goalLocation.x);
+                Debug.Log("goal.y:" + goalLocation.y);
+                goalIsBlocked = 0;
+             }
+         }
     }
 
     //generate all partially blocked squares
@@ -938,11 +983,11 @@ public class makeMap : MonoBehaviour {
     {
         //place blocked squares by randomly selecting non highway cells
         int numBlocked = 0;
-        while (numBlocked < 3840)
+        while (numBlocked < numRows*numCols*.2)
         {
-            int x = (int)((numRows - 1) * Random.value);
-            int z = (int)((numCols - 1) * Random.value);
-            if (map[x, z].typeHighway == 0)
+            int x = Random.Range(0, numRows);
+            int z = Random.Range(0, numCols);
+            if (map[x, z].typeHighway == 0&& !(x==startLocation.x&& z == startLocation.y) && !(x == goalLocation.x && z == goalLocation.y))
             {
                 map[x, z].type = 0;
                 numBlocked++;
@@ -1038,6 +1083,23 @@ public class makeMap : MonoBehaviour {
     //generate the text file
     void convertToText()
     {
+        mapSquare[,] maptemp;
+        mapSquare[,] map1 = transform.gameObject.GetComponent<loadMap>().map;
+        mapSquare[,] map2 = map;
+        if (map1 != null)
+        {
+            maptemp = map1;
+        }
+        else if (map2 != null)
+        {
+            maptemp = map2;
+        }
+        else
+        {
+            return;
+        }
+
+        tw = new StreamWriter("output.txt");
         tw.Write(""+ startLocation);
         tw.WriteLine();
         tw.Write("" + goalLocation);
@@ -1053,27 +1115,27 @@ public class makeMap : MonoBehaviour {
         tw.Write("" +numRows+","+numCols);
         tw.WriteLine();
 
-        for (int i = 0; i < 120; i++)
+        for (int i = 0; i < numRows; i++)
         {
-            for (int j = 0; j < 160; j++)
+            for (int j = 0; j < numCols; j++)
             {
                 if (j != 0)
                 {
                     tw.Write(",");
                 }
                 //tw.Write(map[i, j]);
-                if (map[i, j].typeHighway == 0)
+                if (maptemp[i, j].typeHighway == 0)
                 {
 
-                    if (map[i, j].type == 2)
+                    if (maptemp[i, j].type == 2)
                     {
                         tw.Write("2");
                     }
-                    else if (map[i, j].type == 1)
+                    else if (maptemp[i, j].type == 1)
                     {
                         tw.Write("1");
                     }
-                    else if (map[i, j].type == 0)
+                    else if (maptemp[i, j].type == 0)
                     {
                         tw.Write("0");
                     }
@@ -1122,11 +1184,11 @@ public class makeMap : MonoBehaviour {
                         count = count / 10;
                     }*/
 
-                    if (map[i, j].type == 1)
+                    if (maptemp[i, j].type == 1)
                     {
                         tw.Write("a"+ unicodeString);
                     }
-                    else if (map[i, j].type == 2)
+                    else if (maptemp[i, j].type == 2)
                     {
                         tw.Write("b"+ unicodeString);
                     }
@@ -1145,8 +1207,12 @@ public class makeMap : MonoBehaviour {
     //helper methods
     void updateStarterGoalSquares(Vector2 start, Vector2 goal)
     {
+        //map[(int)start.x, (int)start.y].start = 1;
+        //map[(int)start.x, (int)start.y].goal = 1;
         startObject.transform.position = new Vector3(start.x, 0, start.y);
         goalObject.transform.position = new Vector3(goal.x, 0, goal.y);
+        //convert to text
+        convertToText();
     }
 
     //method that checks whether there is a highway in the point specified
@@ -1276,206 +1342,9 @@ public class makeMap : MonoBehaviour {
     }
 
 
-
+    
     //FOR A*----------------------------------------------------------------------
 
     //returns -1 if unblocked square is the neighbor
-   float findCost(int x, int z, int neighborX, int neighborZ)
-    {
-        float cost = 0;
-        //if blocked return error: -1
-        if (map[x, z].type == 0|| map[neighborX, neighborZ].type==0)
-        {
-            return -1;
-        }
-
-        //if you are unblocked
-        if (map[x, z].type == 1)
-        {
-            //options: unblocked, partially blocked, blocked, unblocked highway, partially blocked highway, diagonal for each
-            //unblocked
-            if (map[neighborX, neighborZ].type == 1)
-            {
-                //if diagonal:
-                if(x!=neighborX||z!= neighborZ)
-                {
-                    cost = Mathf.Sqrt(2);
-                }else
-                {
-                    cost = 1;
-                    if (map[x, z].typeHighway != 0 && map[neighborX, neighborZ].typeHighway != 0)
-                    {
-                        cost = .25f;
-                    }
-                    
-                }
-                return cost;
-            }
-            //partially blocked
-            if (map[neighborX, neighborZ].type == 2)
-            {
-                //if diagonal:
-                if (x != neighborX || z != neighborZ)
-                {
-                    cost = (Mathf.Sqrt(2) + Mathf.Sqrt(8)) / 2;
-                }
-                else
-                {
-                    cost = 1.5f;
-                    if (map[x, z].typeHighway != 0 && map[neighborX, neighborZ].typeHighway != 0)
-                    {
-                        cost = .325f;
-                    }
-                }
-                return cost;
-            }
-        }
-
-        //if you are partially blocked
-        if (map[x, z].type == 2)
-        {
-            //options: unblocked, partially blocked, blocked, unblocked highway, partially blocked highway, diagonal for each
-            //unblocked
-            if (map[neighborX, neighborZ].type == 1)
-            {
-                //if diagonal:
-                if (x != neighborX || z != neighborZ)
-                {
-                    cost = (Mathf.Sqrt(2) + Mathf.Sqrt(8)) / 2;
-
-                }
-                else
-                {
-                    cost = 1.5f;
-                    //check if highway
-                    if(map[x, z].typeHighway != 0&& map[neighborX, neighborZ].typeHighway!=0)
-                    {
-                        cost = .325f;
-                    }
-                }
-                return cost;
-            }
-            //partially blocked
-            if (map[neighborX, neighborZ].type == 2)
-            {
-                //if diagonal:
-                if (x != neighborX || z != neighborZ)
-                {
-                    cost = Mathf.Sqrt(8);
-                }
-                else
-                {
-                    cost = 2f;
-                    if (map[x, z].typeHighway != 0 && map[neighborX, neighborZ].typeHighway != 0)
-                    {
-                        cost = .25f;
-                    }
-                }
-                return cost;
-            }
-        }
-
-        return -1;
-    }
-
-    //rests any old path and visualizes new path
-    void visualizeResetPaths()
-    {
-        //input=array of path
-        //input=path object
-        //input=temporary path object arrayList
-        //this is temporary for input in future
-        //ArrayList path = new ArrayList();
-
-        //stores objects that were used to build path:
-        //ArrayList tempPathObjs = new ArrayList();
-
-        //delete all objects in the tempPathObjs
-        /*for(int i=0; i<tempPathObjs.Count;i++){
-            Destroy(tempPathObjs[i]);
-         }
-         tempPathObjs.Clear();
-        */
-
-        //Loop through whole path
-        /*
-        previous=path[0];
-        current=previous;
-
-        for(int i=0; i<path.Count; i++){
-         previous=current;
-         current=path[i];
-
-         //connect previous with current
-         //8 cases:
-         //upper left
-         if(previous.x-1==current.x&&previous.z-1==current.z){
-             angle=?;
-             pathObject.SetActive(true);
-             Object temp = Instantiate(pathObject, new Vector3(previous.x-.5, 0.55f, previous.z-.5), Quaternion.AngleAxis(angle, Vector3.up));
-             pathObject.SetActive(false);
-             tempPathObjs.Add(temp);
-         }
-         //upper
-         else if(previous.x-1==current.x&&previous.z==current.z){
-             angle=90;
-             pathObject.SetActive(true);
-             Object temp = Instantiate(pathObject, new Vector3(previous.x-.5, 0.55f, previous.z), Quaternion.AngleAxis(angle, Vector3.up));
-             pathObject.SetActive(false);
-             tempPathObjs.Add(temp);
-         }
-         //upper right
-         else if(previous.x-1==current.x&&previous.z+1==current.z){
-             angle=?;
-             pathObject.SetActive(true);
-             Object temp = Instantiate(pathObject, new Vector3(previous.x-.5, 0.55f, previous.z+.5), Quaternion.AngleAxis(angle, Vector3.up));
-             pathObject.SetActive(false);
-             tempPathObjs.Add(temp);
-         }
-         //left
-         else if(previous.x==current.x&&previous.z-1==current.z){
-             angle=0;
-             pathObject.SetActive(true);
-             Object temp = Instantiate(pathObject, new Vector3(previous.x, 0.55f, previous.z-.5), Quaternion.AngleAxis(angle, Vector3.up));
-             pathObject.SetActive(false);
-             tempPathObjs.Add(temp);
-         }
-         //right
-         else if(previous.x==current.x&&previous.z+1==current.z){
-             angle=0;
-             pathObject.SetActive(true);
-             Object temp = Instantiate(pathObject, new Vector3(previous.x, 0.55f, previous.z+.5), Quaternion.AngleAxis(angle, Vector3.up));
-             pathObject.SetActive(false);
-             tempPathObjs.Add(temp);
-         }
-         //lower left
-         else if(previous.x+1==current.x&&previous.z-1==current.z){
-             angle=?;
-             pathObject.SetActive(true);
-             Object temp = Instantiate(pathObject, new Vector3(previous.x+.5, 0.55f, previous.z-.5), Quaternion.AngleAxis(angle, Vector3.up));
-             pathObject.SetActive(false);
-             tempPathObjs.Add(temp);
-         }
-         //lower right
-         else if(previous.x+1==current.x&&previous.z+1==current.z){
-             angle=?;
-             pathObject.SetActive(true);
-             Object temp = Instantiate(pathObject, new Vector3(previous.x+.5, 0.55f, previous.z+.5), Quaternion.AngleAxis(angle, Vector3.up));
-             pathObject.SetActive(false);
-             tempPathObjs.Add(temp);
-         }
-         //lower
-         else if(previous.x+1==current.x&&previous.z==current.z){
-             angle=90;
-             pathObject.SetActive(true);
-             Object temp = Instantiate(pathObject, new Vector3(previous.x+.5, 0.55f, previous.z+.5), Quaternion.AngleAxis(angle, Vector3.up));
-             pathObject.SetActive(false);
-             tempPathObjs.Add(temp);
-         }
-
-
-        }
-
-        */
-    }
+   
 }
