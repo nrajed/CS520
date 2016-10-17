@@ -225,17 +225,45 @@ public class AStarAlgorithm : MonoBehaviour {
 
 	//For Part 2
 	void sequentialAStar() {
-		
+		for(int i=0; i<n+1; i++)
+		{
+			/**ANYTHING IN THIS COMMENT BLOCK REMAINS UNIMPLEMENTED**/
+
+			/**FRINGE=EMPTY
+			//CLOSED=EMPTY**/
+
+			//different g-value for each search
+			map[(int)startLocation.x, (int)startLocation.y].g = 0f;
+			map[(int)goalLocation.x, (int)goalLocation.y].g = float.MaxValue;
+
+			/**bpi(start)=bpi(goal)=null?**/
+
+			fringe.Insert(startLocation, Key(startLocation,i));
+
+			/**WHILE LOOP**/
+
+		}
 	}
 
 	//Helper Methods
-	int Key(Vector2 s, int i)
+	float Key(Vector2 s, int i)
 	{
-		
+		return g(s) + w * h1 (s, goalLocation);
 	}
 
 	void ExpandState(Vector2 s, int i)
 	{
+		fringe.Remove(s);
+
+		//For all neighbors in succ(s)
+		for(int j=-1; j<=1; j++) {
+			for(int k=-1; k<=1; k++) {
+				/**if map[j,k] wasn't generated in i'th search
+				 * g(
+				 * 
+				 **/
+			}
+		}
 
 	}
 
