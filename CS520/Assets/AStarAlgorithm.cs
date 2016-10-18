@@ -13,6 +13,7 @@ public class AStarAlgorithm : MonoBehaviour {
     Process proc;
     long mem;
     public float w;
+	public int h; //heuristic number
     Stopwatch stopwatch = new Stopwatch();
 
     int numNodes;
@@ -25,6 +26,13 @@ public class AStarAlgorithm : MonoBehaviour {
 
     public PriorityQueue fringe = new PriorityQueue();
     public PriorityQueue closed = new PriorityQueue();
+	public float w2; //secondary heuristic value
+
+	//FOR SEQUENTIAL A*
+	public int n;
+	public PriorityQueue[] OPEN;
+	public PriorityQueue[] CLOSED;
+	public ArrayList mapList = new ArrayList ();
 
     public Vector2[] centers = new Vector2[8];
 
@@ -36,7 +44,13 @@ public class AStarAlgorithm : MonoBehaviour {
 
         //set weight of A*
         //f=g+wh
-        w = 1f; //weight 
+        w = 1f; //weight
+		h = 1; //heuristic
+		w2 = 1f;
+
+		n=4; //num heuristics minus 1
+		OPEN = new PriorityQueue[n];
+		CLOSED = new PriorityQueue[n];
 
         //temporary pathobject in path
         tempPathObjs = new ArrayList();
@@ -99,6 +113,14 @@ public class AStarAlgorithm : MonoBehaviour {
        // map[(int)curr.x, (int)curr.y].g = map[(int)parent.x, (int)parent.y].g + findCost((int)curr.x, (int)curr.y,(int)parent.x, (int)parent.y);
         //return (Mathf.Sqrt(Mathf.Pow((curr - startLocation).x,2)+ Mathf.Pow((curr - startLocation).y, 2));
     }
+	float g(Vector2 curr, int i)
+	{
+		if(curr.x==-1) { return 0; }
+
+		return map[(int)curr.x, (int)curr.y].SequentialG[i];
+		// map[(int)curr.x, (int)curr.y].g = map[(int)parent.x, (int)parent.y].g + findCost((int)curr.x, (int)curr.y,(int)parent.x, (int)parent.y);
+		//return (Mathf.Sqrt(Mathf.Pow((curr - startLocation).x,2)+ Mathf.Pow((curr - startLocation).y, 2));
+	}
 
     //Prioritize longer axis
     public float h1(Vector2 s, Vector2 g)
@@ -224,52 +246,99 @@ public class AStarAlgorithm : MonoBehaviour {
     }
 
 	//For Part 2
-	void sequentialAStar() {
-		for(int i=0; i<n+1; i++)
-		{
-			/**ANYTHING IN THIS COMMENT BLOCK REMAINS UNIMPLEMENTED**/
-
-			/**FRINGE=EMPTY
-			//CLOSED=EMPTY**/
+	/*int sequentialAStar() {
+		
+		for (int i = 0; i <= n; i++) {
+			ANYTHING IN THIS COMMENT BLOCK REMAINS UNIMPLEMENTED
 
 			//different g-value for each search
-			map[(int)startLocation.x, (int)startLocation.y].g = 0f;
-			map[(int)goalLocation.x, (int)goalLocation.y].g = float.MaxValue;
+			map [(int)startLocation.x, (int)startLocation.y].SequentialG.Add(0f);
+			map [(int)goalLocation.x, (int)goalLocation.y].SequentialG.Add(float.MaxValue);
 
-			/**bpi(start)=bpi(goal)=null?**/
+			//start and goal don't have parents
+			map [(int)startLocation.x, (int)startLocation.y].SequentialParent.Add(new Vector2(-2,-1));
+			map [(int)goalLocation.x, (int)goalLocation.y].SequentialParent.Add(new Vector2(-2,-1));
 
-			fringe.Insert(startLocation, Key(startLocation,i));
+			OPEN[i].Insert (startLocation, Key (startLocation, i));
+		}
 
-			/**WHILE LOOP**/
+		Vector2 s = OPEN [0].Pop ();
+		float minKey0 = Key (s, 0);
+		while(minKey0<float.MaxValue)
+		{
+			for (int i = 1; i <= n; i++) {
+				float minKeyI = Key (OPEN [i].Pop, i);
+				if(minKeyI <= w2*minKey0){
+					if(map[(int)goalLocation.x,(int)goalLocation.y].SequentialG[i] <= minKeyI) {
+						if(map[(int)goalLocation.x,(int)goalLocation.y].SequentialG[i] <= float.MaxValue) {
+							return i;
+						}
+					}
+					else {
+						s = OPEN [i].Pop ();
+						ExpandState (s, i);
+						CLOSED [i].Insert (s, Key(s,i));
+					}
+				}
+				else {
+					if(g(goalLocation) <= minKey0){
+						if(g(goalLocation) < float.MaxValue) {
+							return 0;
+						}
 
+					}
+					else {
+						s = OPEN [0].Pop ();
+						ExpandState (s, 0);
+						CLOSED [0].Insert (s, Key(s,0));
+					}
+				}
+			}
 		}
 	}
 
 	//Helper Methods
 	float Key(Vector2 s, int i)
 	{
-		return g(s) + w * h1 (s, goalLocation);
+		switch(h)
+		{
+			case 1:
+				return g(s,i) + w * h1 (s, goalLocation);
+			case 2:
+				return g(s,i) + w * h2 (s, goalLocation);
+			case 3:
+				return g(s,i) + w * h3 (s, goalLocation);
+			case 4:
+				return g(s,i) + w * h4 (s, goalLocation);
+			default:
+				return g(s,i) + w * h5 (s, goalLocation);
+		}
 	}
 
 	void ExpandState(Vector2 s, int i)
 	{
-		fringe.Remove(s);
+		OPEN[i].Remove (s);
 
 		//For all neighbors in succ(s)
-		for(int j=-1; j<=1; j++) {
-			for(int k=-1; k<=1; k++) {
-				/**if map[j,k] wasn't generated in i'th search
-				 * g(
-				 * 
-				 **/
+		for (int j = -1; j <= 1; j++) {
+			for (int k = -1; k <= 1; k++) {
+				Vector2 curr = new Vector2 (s.x + i, s.y + j);
+				if (!(OPEN [i].contains (curr) || CLOSED[i].contains(curr))) {
+					map [curr.x, curr.y].SequentialG[i] = float.MaxValue;
+					map [curr.x, curr.y].SequentialParent[i] = new Vector2(-2,-1);
+				}
+				if (g (curr) > g (s) + findCost (s.x, s.y, curr.x, curr.y)) {
+					map [curr.x, curr.y].SequentialG[i] = g (s) + findCost (s.x, s.y, curr.x, curr.y);
+					map [curr.x, curr.y].SequentialParent[i] = s;
+
+					//If not in open list
+					if (!CLOSED [i].contains (curr)) { 
+						OPEN [i].Insert (curr, Key (s, i)); //add to open list
+					}
+				}
 			}
 		}
-
-	}
-
-	void IntegratedHeuristicAStar() {
-	
-	}
+	}*/
 
     //finds cost given parent node(x,z) and neighbor node (neighborX, neighborZ)
     float findCost(int x, int z, int neighborX, int neighborZ)

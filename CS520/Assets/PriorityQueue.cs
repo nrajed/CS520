@@ -50,7 +50,7 @@ public class PriorityQueue : MonoBehaviour {
     {
         if (values.Count != 0&& values.Count != 1)
         {
-            return (float)values[0];
+            return (float)keys[1];
         }
         return -1;
     }

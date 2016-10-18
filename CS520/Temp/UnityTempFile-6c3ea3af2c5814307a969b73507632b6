@@ -85,6 +85,7 @@
 -define:UNITY_EDITOR_OSX
 -define:UNITY_TEAM_LICENSE
 'Assets/AStarAlgorithm.cs'
+'Assets/Phase2AStar_Sequential.cs'
 'Assets/PriorityQueue.cs'
 'Assets/loadMap.cs'
 'Assets/makeMap.cs'
