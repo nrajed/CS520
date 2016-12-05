@@ -97,8 +97,8 @@ public class loadMap : MonoBehaviour {
             string[] rowscolumns = rowcolumn.Split(',');
              row = int.Parse(rowscolumns[0]);
             column = int.Parse(rowscolumns[1]);
-            Debug.Log("row:" + row);
-            Debug.Log("column:" + column);
+            //Debug.Log("row:" + row);
+            //Debug.Log("column:" + column);
             map = new mapSquare[row, column];
             string[] line;
             string type;

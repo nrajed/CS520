@@ -6,6 +6,7 @@ public class makeMap : MonoBehaviour {
 
     public int numRows=20;//120
     public int numCols=20;//160
+    public int pathMax;
 
     //matrix storage of all coordinates
     public mapSquare[,] map;
@@ -37,35 +38,27 @@ public class makeMap : MonoBehaviour {
 
     //see if n was already pressed
     int nOnce = 0;
+    int numberAStar = 0;
+
 
     // Use this for initialization
     void Start () {
-        maxPath = 100;
-        numRows = 120;
-        numCols = 160;
-}
+        maxPath = 2;//100;
+        numRows = 5;//120;
+        numCols = 5;//160;
+        pathMax = 1;//20
+        numberAStar = 0;
+    }
 
     void Update()
     {
         //make new map
         if (Input.GetKey(KeyCode.N) && nOnce == 0)
         {
-            nOnce = 1;
-           
-            map = new mapSquare[numRows, numCols];
-
-            //generate map
-            generateUnblocked();
-            generateStartGoal();
-            updateStarterGoalSquares(startLocation, goalLocation);
-            generatePartiallyBlocked();
-            generateHighwayPoints();
-            assignEachPointOnHighway();
-            generateBlocked();
-
+            makeMapGreat();
             //display squares
             displaySquares();
-            
+
 
             //convert to text
             convertToText();
@@ -76,10 +69,166 @@ public class makeMap : MonoBehaviour {
             generateStartGoal();
             updateStarterGoalSquares(startLocation, goalLocation);
         }
-        
+        if (Input.GetKey(KeyCode.K))
+        {
+            //Debug.Log("get K: all the paths");
+
+            float[] results = new float[76];
+            float[] allResults = new float[76];
+
+            for (int f = 0; f < 76; f++)
+            {
+                allResults[f] = 0;
+            }
+
+            AStarAlgorithm astar = this.gameObject.GetComponent<AStarAlgorithm>();
+            Phase2AStar_Sequential seqastar = this.gameObject.GetComponent<Phase2AStar_Sequential>();
+            Phase2AStar_Integrated intastar = this.gameObject.GetComponent<Phase2AStar_Integrated>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                results = new float[76];
+                //if (numberAStar == 0 || numberAStar == 3)
+                //{
+                //generate new map
+                map = new mapSquare[numRows, numCols];
+                generateUnblocked();
+                generateStartGoal();
+                updateStarterGoalSquares(startLocation, goalLocation);
+                generatePartiallyBlocked();
+                generateHighwayPoints();
+                assignEachPointOnHighway();
+                generateBlocked();
+                //display squares
+               // displaySquares();
+                //convert to text
+                convertToText();
+                numberAStar = 0;
+                Debug.Log("We generated new map with start: " + startLocation + " and goal: " + goalLocation);
+                //}
+
+                //if (numberAStar == 0)
+                //{
+                Debug.Log("Weighted A*-------------------------------------------");
+                //start with weighted astar
+                astar.enabled = true;
+                seqastar.enabled = false;
+                intastar.enabled = false;
+
+                results=astar.calculateAllPathsAStar(results);
+                for(int f = 0; f < 76; f++)
+                {
+                    allResults[f] = allResults[f]+results[f];
+                }
+                //}
+                //else if (numberAStar == 1)
+                //{
+                Debug.Log("Sequential A*-------------------------------------------");
+                //sequential astar
+                astar.enabled = false;
+                seqastar.enabled = true;
+                intastar.enabled = false;
+
+                results=seqastar.calculateAllPathsAStar(results);
+                for (int f = 0; f < 76; f++)
+                {
+                    allResults[f] = allResults[f] + results[f];
+                }
+                //}
+                //else if (numberAStar == 2)
+                //{
+                Debug.Log("Integrated A*-------------------------------------------");
+                //integrated astar
+                astar.enabled = false;
+                seqastar.enabled = false;
+                intastar.enabled = true;
+
+                results=intastar.calculateAllPathsAStar(results);
+                for (int f = 0; f < 76; f++)
+                {
+                    allResults[f] = allResults[f] + results[f];
+                }
+                //}
+                //numberAStar++;
+
+                
+
+
+            }
+
+
+            for (int f = 0; f < 76; f++)
+            {
+                Debug.Log("result "+f +":"+ allResults[f]/10);
+            }
+
+        }    
+            
     }
+
+
+    public void makeMapGreat()
+    {
+        nOnce = 1;
+
+        map = new mapSquare[numRows, numCols];
+        Debug.Log("generateMap");
+
+        //generate map
+        generateUnblocked();
+        //generateStartGoal();
+        //updateStarterGoalSquares(startLocation, goalLocation);
+        startLocation = new Vector2((int)Random.Range(0, 4), (int)Random.Range(0, 4));
+        generatePartiallyBlocked();
+        generateHighwayPoints();
+        assignEachPointOnHighway();
+        generateBlocked();
+    }
+
+
+    //display all squares in unity
+    public void displaySquaresGround()
+    {
+        //go through map and place the right squares in the right places
+        for (int r = 0; r < numRows; r++)
+        {
+            for (int c = 0; c < numCols; c++)
+            {
+                if (map[r, c].type == 0)
+                {
+                    blockedSquare.SetActive(true);
+                    Object temp = Instantiate(blockedSquare, new Vector3(r, 0, c), Quaternion.identity);
+                    blockedSquare.SetActive(false);
+                }
+                else if (map[r, c].type == 1)
+                {
+                    unblockedSquare.SetActive(true);
+                    Object temp = Instantiate(unblockedSquare, new Vector3(r, 0, c), Quaternion.identity);
+                    unblockedSquare.SetActive(false);
+                }
+                else if (map[r, c].type == 2)
+                {
+                    partiallyBlockedSquare.SetActive(true);
+                    Object temp = Instantiate(partiallyBlockedSquare, new Vector3(r, 0, c), Quaternion.identity);
+                    partiallyBlockedSquare.SetActive(false);
+                }
+                //place highways
+                if (map[r, c].path == 1)
+                {
+                    horizontalHighway.SetActive(true);
+                    Object temp = Instantiate(horizontalHighway, new Vector3(r, 0.5f, c), Quaternion.identity);
+                    horizontalHighway.SetActive(false);
+                }
+                
+            }
+        }
+    }
+
+
+
+
     //generate all unblocked squares: all in the beginning
-    void generateUnblocked()
+    public void generateUnblocked()
     {
         //initialize the map to unblocked squares
         for (int r = 0; r < numRows; r++)
@@ -93,7 +242,7 @@ public class makeMap : MonoBehaviour {
     }
 
     //generate the start and goal locations
-    void generateStartGoal()
+    public void generateStartGoal()
     {
         //generate start and goal states
        int startIsBlocked = 1;
@@ -138,9 +287,9 @@ public class makeMap : MonoBehaviour {
 
             if (maptemp[(int)startLocation.x, (int)startLocation.y].type != 0)
              {
-                Debug.Log("startlocation: type!=0 so unblocked");
-                Debug.Log("start.x:" + startLocation.x);
-                Debug.Log("start.y:" + startLocation.y);
+                //Debug.Log("startlocation: type!=0 so unblocked");
+                //Debug.Log("start.x:" + startLocation.x);
+                //Debug.Log("start.y:" + startLocation.y);
                 startIsBlocked = 0;
              }
 
@@ -189,16 +338,16 @@ public class makeMap : MonoBehaviour {
              goalLocation = goalVector;
              if (maptemp[(int)goalLocation.x, (int)goalLocation.y].type != 0)
              {
-                Debug.Log("goalLocation: type!=0 so unblocked");
-                Debug.Log("goal.x:" + goalLocation.x);
-                Debug.Log("goal.y:" + goalLocation.y);
+                //Debug.Log("goalLocation: type!=0 so unblocked");
+                //Debug.Log("goal.x:" + goalLocation.x);
+                //Debug.Log("goal.y:" + goalLocation.y);
                 goalIsBlocked = 0;
              }
          }
     }
 
     //generate all partially blocked squares
-    void generatePartiallyBlocked()
+    public void generatePartiallyBlocked()
     {
         //place partially blocked squares by randomly deciding on 8 coordinates
         for (int i = 0; i < 8; i++)
@@ -234,7 +383,7 @@ public class makeMap : MonoBehaviour {
     }
 
     //generate the highway turning points so that can later can fill in what is between them
-    void generateHighwayPoints()
+    public void generateHighwayPoints()
     {
         int stoppingTime = 0;
 
@@ -246,15 +395,15 @@ public class makeMap : MonoBehaviour {
             stoppingTime++;
             if (stoppingTime == 10000)
             {
-                Debug.Log("hit 1000");
+                //Debug.Log("hit 1000");
             }
             if (stoppingTime == 50000)
             {
-                Debug.Log("hit 10000");
+                //Debug.Log("hit 10000");
             }
             if (stoppingTime == 100000)
             {
-                Debug.Log("hit 50000");
+                //Debug.Log("hit 50000");
             }
 
             //1,000,000
@@ -312,7 +461,7 @@ public class makeMap : MonoBehaviour {
                     if (startHighway.y + 1 < numCols)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             int xCoord = (int)startHighway.x;
                             int zCoord = (int)startHighway.y + i - 1;
@@ -334,7 +483,7 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y + 20 - 1);
+                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y + pathMax - 1);
                         currentPath.Add(startHighway);
                         break;
                     }
@@ -350,7 +499,7 @@ public class makeMap : MonoBehaviour {
                     if (startHighway.y - 1 >= 0)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             int xCoord = (int)startHighway.x;
                             int zCoord = (int)startHighway.y - i + 1;
@@ -372,7 +521,7 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y - 20 + 1);
+                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y - pathMax + 1);
                         currentPath.Add(startHighway);
                         break;
                     }
@@ -388,7 +537,7 @@ public class makeMap : MonoBehaviour {
                     if (startHighway.x + 1 < numRows)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             int xCoord = (int)startHighway.x + i - 1;
                             int zCoord = (int)startHighway.y;
@@ -411,7 +560,7 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x + 20 - 1, (int)startHighway.y);
+                        startHighway = new Vector2((int)startHighway.x + pathMax - 1, (int)startHighway.y);
                         currentPath.Add(startHighway);
                         break;
                     }
@@ -427,7 +576,7 @@ public class makeMap : MonoBehaviour {
                     if (startHighway.x - 1 >= 0)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             int xCoord = (int)startHighway.x - i + 1;
                             int zCoord = (int)startHighway.y;
@@ -449,7 +598,7 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x - 20 + 1, (int)startHighway.y);
+                        startHighway = new Vector2((int)startHighway.x - pathMax + 1, (int)startHighway.y);
                         currentPath.Add(startHighway);
                         break;
                     }
@@ -466,7 +615,7 @@ public class makeMap : MonoBehaviour {
                 continue;
             }
 
-            count = 20;
+            count = pathMax;
             //--------------------------------------------------finish starting path component-----------------------------------------------------
 
             //-----------------------------------------------------do other direction components---------------------------------------------------
@@ -483,7 +632,7 @@ public class makeMap : MonoBehaviour {
                     if (direction == 0)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             count++;
                             int xCoord = (int)startHighway.x;
@@ -523,14 +672,14 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y + 20 - 1);
+                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y + pathMax - 1);
                         currentPath.Add(startHighway);
                     }
                     //left
                     if (direction == 1)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             count++;
                             int xCoord = (int)startHighway.x;
@@ -569,14 +718,14 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y - 20 + 1);
+                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y - pathMax + 1);
                         currentPath.Add(startHighway);
                     }
                     //down
                     if (direction == 2)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             count++;
                             int xCoord = (int)startHighway.x + i - 1;
@@ -615,14 +764,14 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x + 20 - 1, (int)startHighway.y);
+                        startHighway = new Vector2((int)startHighway.x + pathMax - 1, (int)startHighway.y);
                         currentPath.Add(startHighway);
                     }
                     //up
                     if (direction == 3)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             count++;
                             int xCoord = (int)startHighway.x - i + 1;
@@ -661,7 +810,7 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x - 20 + 1, (int)startHighway.y);
+                        startHighway = new Vector2((int)startHighway.x - pathMax + 1, (int)startHighway.y);
                         currentPath.Add(startHighway);
                     }
                 }
@@ -672,7 +821,7 @@ public class makeMap : MonoBehaviour {
                     if (direction == 2 || direction == 3)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             count++;
                             int xCoord = (int)startHighway.x;
@@ -712,7 +861,7 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y + 20 - 1);
+                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y + pathMax - 1);
                         currentPath.Add(startHighway);
                         direction = 0;
                     }
@@ -720,7 +869,7 @@ public class makeMap : MonoBehaviour {
                     if (direction == 0 || direction == 1)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             count++;
                             int xCoord = (int)startHighway.x - i + 1;
@@ -759,7 +908,7 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x - 20 + 1, (int)startHighway.y);
+                        startHighway = new Vector2((int)startHighway.x - pathMax + 1, (int)startHighway.y);
                         currentPath.Add(startHighway);
                         direction = 3;
                     }
@@ -774,7 +923,7 @@ public class makeMap : MonoBehaviour {
                     if (direction == 2 || direction == 3)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             count++;
                             int xCoord = (int)startHighway.x;
@@ -813,7 +962,7 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y - 20 + 1);
+                        startHighway = new Vector2((int)startHighway.x, (int)startHighway.y - pathMax + 1);
                         currentPath.Add(startHighway);
                         direction = 1;
                     }
@@ -821,7 +970,7 @@ public class makeMap : MonoBehaviour {
                     if (direction == 0 || direction == 1)
                     {
                         //for 20 blocks move out
-                        for (int i = 1; i <= 20; i++)
+                        for (int i = 1; i <= pathMax; i++)
                         {
                             count++;
                             int xCoord = (int)startHighway.x + i - 1;
@@ -860,7 +1009,7 @@ public class makeMap : MonoBehaviour {
                         {
                             break;
                         }
-                        startHighway = new Vector2((int)startHighway.x + 20 - 1, (int)startHighway.y);
+                        startHighway = new Vector2((int)startHighway.x + pathMax - 1, (int)startHighway.y);
                         currentPath.Add(startHighway);
                         direction = 2;
                     }
@@ -895,13 +1044,13 @@ public class makeMap : MonoBehaviour {
     }
 
     //fills in all points in between the points generated by generateHighwayPoints
-    void assignEachPointOnHighway()
+    public void assignEachPointOnHighway()
     {
-        Debug.Log("start printing---------------------------------------");
+        //Debug.Log("start printing---------------------------------------");
         int countPoints = 0;
         for (int i = 0; i < paths.Count; i++)
         {
-            Debug.Log("next path-------------------------");
+           // Debug.Log("next path-------------------------");
             if (paths[i] != null)
             {
                 ArrayList temp = (ArrayList)paths[i];
@@ -912,14 +1061,14 @@ public class makeMap : MonoBehaviour {
                 {
                     continue;
                 }
-                Debug.Log("1st point" + currentPoint);
+                //Debug.Log("1st point" + currentPoint);
                 countPoints = 1;
                 //go through each point in temp
                 for (int j = 1; j < temp.Count; j++)
                 {
                     previousPoint = currentPoint;
                     currentPoint = (Vector2)temp[j];
-                    Debug.Log(currentPoint);
+                    //Debug.Log(currentPoint);
                     //connect previousPoint and currentPoint
                     int x1 = (int)previousPoint.x;
                     int z1 = (int)previousPoint.y;
@@ -979,7 +1128,7 @@ public class makeMap : MonoBehaviour {
     }
 
     //generate all blocked squares
-    void generateBlocked()
+    public void generateBlocked()
     {
         //place blocked squares by randomly selecting non highway cells
         int numBlocked = 0;
@@ -1205,7 +1354,7 @@ public class makeMap : MonoBehaviour {
     }
 
     //helper methods
-    void updateStarterGoalSquares(Vector2 start, Vector2 goal)
+    public void updateStarterGoalSquares(Vector2 start, Vector2 goal)
     {
         //map[(int)start.x, (int)start.y].start = 1;
         //map[(int)start.x, (int)start.y].goal = 1;

@@ -27,12 +27,19 @@ public class mapSquare : MonoBehaviour {
 	public float[] SequentialG;
 	public Vector2[] SequentialParent;
 
+    //use for filtering....
+    //0 there is a path
+    //1 there is no path
+    public int path;
+
 	//FOR A*-----------------------------------------
 	public Vector2 parent;
 	public float g;
-	//---------------------------------------------
+    public float f;
+    public float h;
+    //---------------------------------------------
 
-	public mapSquare()
+    public mapSquare()
 	{
 		type = 1;
 		typeHighway = 0;

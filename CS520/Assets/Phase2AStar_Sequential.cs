@@ -15,9 +15,9 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 	public float w;
 	public int h; //heuristic number
 	Stopwatch stopwatch = new Stopwatch();
-
-	int numNodes;
-
+    float pathCost;
+    int numNodes;
+    int maxMem;
 	//path that A* follows
 	//array list of vectors where path passes through
 	public ArrayList path = new ArrayList();
@@ -39,15 +39,16 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 	// Use this for initialization
 	void Start()
 	{
+        maxMem = 0;
 		numNodes = 0;
 		proc = Process.GetCurrentProcess();
 		mem = proc.PrivateMemorySize64;
 
 		//set weight of A*
 		//f=g+wh
-		w = 1f; //weight
-		h = 1; //heuristic
-		w2 = 1f;
+		//w = 2.5f; //weight
+		//h = 1; //heuristic
+		//w2 = 1.25f;
 
 		n = 4; //num heuristics minus 1
 		OPEN = new PriorityQueue[n+1];
@@ -178,15 +179,178 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 	}
 
 
-	//For Part 2
-	int sequentialAStar()
-	{
-		//map[(int)startLocation.x, (int)startLocation.y].SequentialG = new ArrayList();
-		//map[(int)startLocation.x, (int)startLocation.y].SequentialParent = new ArrayList();
-		//map[(int)goalLocation.x, (int)goalLocation.y].SequentialG = new ArrayList();
-		//map[(int)goalLocation.x, (int)goalLocation.y].SequentialParent = new ArrayList();
 
-		for (int i = 0; i <= n; i++)
+
+    //For Part 2
+
+
+    public float[] calculateAllPathsAStar(float[] results)
+    {
+        UnityEngine.Debug.Log("computing astar path---------------------------");
+        long stopWatchSumw1w1 = 0;
+        int pathCountSumw1w1 = 0;
+        int numNodesSumw1w1 = 0;
+        float pathCostSumw1w1 = 0;
+
+        long stopWatchSumw1w2 = 0;
+        int pathCountSumw1w2 = 0;
+        int numNodesSumw1w2 = 0;
+        float pathCostSumw1w2 = 0;
+
+        long stopWatchSumw2w1 = 0;
+        int pathCountSumw2w1 = 0;
+        int numNodesSumw2w1 = 0;
+        float pathCostSumw2w1 = 0;
+
+        long stopWatchSumw2w2 = 0;
+        int pathCountSumw2w2 = 0;
+        int numNodesSumw2w2 = 0;
+        float pathCostSumw2w2 = 0;
+
+
+
+
+            w = 1.5f;
+            w2 = 1.25f;
+        calculateAStar();
+            stopWatchSumw1w1 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw1w1 += path.Count;
+            numNodesSumw1w1 += numNodes;
+            pathCostSumw1w1 += pathCost;
+        //  UnityEngine.Debug.Log("Sequential. w1=1.5, w2=1.25. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("Sequential. w1=1.5, w2=1.25. memory: " + maxMem);
+        //UnityEngine.Debug.Log("Sequential. w1=1.5, w2=1.25. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("Sequential. w1=1.5, w2=1.25. path cost: " + pathCost);
+        results[44] = stopwatch.ElapsedMilliseconds;
+        results[45] = maxMem;
+        results[46] = numNodes;
+        results[47] = pathCost;
+
+        w = 1.5f;
+        w2 = 2f;
+        calculateAStar();
+        stopWatchSumw1w2 += stopwatch.ElapsedMilliseconds;
+        pathCountSumw1w2 += path.Count;
+        numNodesSumw1w2 += numNodes;
+        pathCostSumw1w2 += pathCost;
+        //UnityEngine.Debug.Log("Sequential. w1=1.5, w2=2. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("Sequential. w1=1.5, w2=2. memory: " + maxMem);
+        //UnityEngine.Debug.Log("Sequential. w1=1.5, w2=2. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("Sequential. w1=1.5, w2=2. path cost: " + pathCost);
+        results[48] = stopwatch.ElapsedMilliseconds;
+        results[49] = maxMem;
+        results[50] = numNodes;
+        results[51] = pathCost;
+
+
+
+        w = 2.5f;
+        w2 = 1.25f;
+        calculateAStar();
+        stopWatchSumw2w1 += stopwatch.ElapsedMilliseconds;
+        pathCountSumw2w1 += path.Count;
+        numNodesSumw2w1 += numNodes;
+        pathCostSumw2w1 += pathCost;
+        //UnityEngine.Debug.Log("Sequential. w1=2.5, w2=1.25. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("Sequential. w1=2.5, w2=1.25. memory: " + maxMem);
+        //UnityEngine.Debug.Log("Sequential. w1=2.5, w2=1.25. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("Sequential. w1=2.5, w2=1.25. path cost: " + pathCost);
+        results[52] = stopwatch.ElapsedMilliseconds;
+        results[53] = maxMem;
+        results[54] = numNodes;
+        results[55] = pathCost;
+
+        w = 2.5f;
+        w2 = 2f;
+        calculateAStar();
+        stopWatchSumw2w2 += stopwatch.ElapsedMilliseconds;
+        pathCountSumw2w2 += path.Count;
+        numNodesSumw2w2 += numNodes;
+        pathCostSumw2w2 += pathCost;
+        //UnityEngine.Debug.Log("Sequential. w1=2.5, w2=2. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("Sequential. w1=2.5, w2=2. memory: " + maxMem);
+        //UnityEngine.Debug.Log("Sequential. w1=2.5, w2=2. number of nodes: " + numNodes);
+        //   UnityEngine.Debug.Log("Sequential. w1=2.5, w2=2. path cost: " + pathCost);
+        results[56] = stopwatch.ElapsedMilliseconds;
+        results[57] = maxMem;
+        results[58] = numNodes;
+        results[59] = pathCost;
+
+        return results;
+    }
+
+    void calculateAStar()
+    {
+        maxMem = 0;
+        numNodes = 0;
+        proc = Process.GetCurrentProcess();
+        mem = proc.PrivateMemorySize64;
+        n = 4; //num heuristics minus 1
+
+        //temporary pathobject in path
+        tempPathObjs = new ArrayList();
+
+        pathCost = 0;
+        numNodes = 0;
+        stopwatch.Reset();
+        stopwatch.Start();
+        path = new ArrayList();
+
+
+        OPEN = new PriorityQueue[n + 1];
+        CLOSED = new PriorityQueue[n + 1];
+        //compute A*
+        mapSquare[,] map1 = transform.gameObject.GetComponent<loadMap>().map;
+        mapSquare[,] map2 = transform.gameObject.GetComponent<makeMap>().map;
+        if (map1 != null)
+        {
+            map = map1;
+            startLocation = transform.gameObject.GetComponent<loadMap>().startLocation;
+            goalLocation = transform.gameObject.GetComponent<loadMap>().goalLocation;
+            centers = transform.gameObject.GetComponent<loadMap>().centers;
+        }
+        else
+        {
+            map = map2;
+            startLocation = transform.gameObject.GetComponent<makeMap>().startLocation;
+            goalLocation = transform.gameObject.GetComponent<makeMap>().goalLocation;
+            centers = transform.gameObject.GetComponent<makeMap>().centerPartiallyBlocked;
+        }
+        if (sequentialAStar()!=-1)
+        {
+            Vector2 curr = goalLocation;
+            float[] gs = map[(int)curr.x, (int)curr.y].SequentialG;
+            for (int i = 0; i < gs.Length; i++)
+            {
+                //gs[]
+            }
+            //pathCost = map[(int)curr.x, (int)curr.y].g;
+            while (curr != startLocation)
+            {
+                path.Add(curr);
+                curr = map[(int)curr.x, (int)curr.y].parent;
+            }
+            path.Add(curr);
+            stopwatch.Stop();
+
+            //mem = proc.PrivateMemorySize64;
+
+            //UnityEngine.Debug.Log("mem:" + mem);
+
+            //visualizeResetPaths();
+        }
+    }
+
+
+    int sequentialAStar()
+	{
+        
+        //map[(int)startLocation.x, (int)startLocation.y].SequentialG = new ArrayList();
+        //map[(int)startLocation.x, (int)startLocation.y].SequentialParent = new ArrayList();
+        //map[(int)goalLocation.x, (int)goalLocation.y].SequentialG = new ArrayList();
+        //map[(int)goalLocation.x, (int)goalLocation.y].SequentialParent = new ArrayList();
+
+        for (int i = 0; i <= n; i++)
 		{
 			/**ANYTHING IN THIS COMMENT BLOCK REMAINS UNIMPLEMENTED**/
 
@@ -203,7 +367,11 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 			OPEN[i] = new PriorityQueue();
 			CLOSED[i] = new PriorityQueue();
 			OPEN[i].Insert(startLocation, Key(startLocation, i));
-		}
+            if (OPEN[i].getSize() > maxMem)
+            {
+                maxMem = OPEN[i].getSize();
+            }
+        }
 
 		//Vector2 s = OPEN[0].Pop();
 		//float minKey0 = Key(s, 0);
@@ -226,7 +394,11 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 						Vector2 s = OPEN[i].Pop();
 						ExpandState(s, i);
 						CLOSED[i].Insert(s, Key(s, i));
-					}
+                        if (CLOSED[i].getSize() > maxMem)
+                        {
+                            maxMem = CLOSED[i].getSize();
+                        }
+                    }
 				}
 				else
 				{
@@ -243,7 +415,11 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 						Vector2 s = OPEN[0].Pop();
 						ExpandState(s, 0);
 						CLOSED[0].Insert(s, Key(s, 0));
-					}
+                        if (CLOSED[0].getSize() > maxMem)
+                        {
+                            maxMem = CLOSED[0].getSize();
+                        }
+                    }
 				}
 			}
 		}
@@ -256,11 +432,11 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 		switch (i)
 		{
 		case 0:
-			return g(s, i) + w * h1(s, goalLocation);
-		case 1:
-			return g(s, i) + w * h2(s, goalLocation);
-		case 2:
 			return g(s, i) + w * h3(s, goalLocation);
+		case 1:
+			return g(s, i) + w * h1(s, goalLocation);
+		case 2:
+			return g(s, i) + w * h2(s, goalLocation);
 		case 3:
 			return g(s, i) + w * h4(s, goalLocation);
 		default:
@@ -268,8 +444,9 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 		}
 	}
 
-	void ExpandState(Vector2 s, int i)
+    void ExpandState(Vector2 s, int i)
 	{
+        numNodes++;
 		OPEN[i].Remove(s);
 
 		//For all neighbors in succ(s)
@@ -293,7 +470,11 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 							//If not in open list
 							if (!CLOSED [i].contains (curr)) {
 								OPEN [i].Insert (curr, Key (curr, i)); //add to open list
-							}
+                                if (OPEN[i].getSize() > maxMem)
+                                {
+                                    maxMem = OPEN[i].getSize();
+                                }
+                            }
 						}
 					}
 				}

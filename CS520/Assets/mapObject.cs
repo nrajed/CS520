@@ -72,10 +72,13 @@ public class mapObject : MonoBehaviour {
                 int c=(int)Mathf.Round(point.z);
                 mapSquare[,] map1 = transform.gameObject.GetComponent<loadMap>().map;
                 mapSquare[,] map2 = transform.gameObject.GetComponent<makeMap>().map;
+                int w = 0;
+
                 if (map1 != null)
                 {
                     map = map1;
                     goalLocation=transform.gameObject.GetComponent<loadMap>().goalLocation;
+   
                 }
                 else
                 {
@@ -83,7 +86,7 @@ public class mapObject : MonoBehaviour {
                     goalLocation = transform.gameObject.GetComponent<makeMap>().goalLocation;
                 }
                 float h1 = this.transform.gameObject.GetComponent<AStarAlgorithm>().h1(new Vector2(r, c), goalLocation);
-                displaySquareType.text = "g:"+map[r, c].g+"| h:"+h1 + "| f:" + (map[r, c].g+h1);
+                displaySquareType.text = "g:"+map[r, c].g+"| h:"+h1 + "| f:" + map[r, c].f;
             }
 
         }

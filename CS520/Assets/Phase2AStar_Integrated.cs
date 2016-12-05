@@ -14,9 +14,9 @@ public class Phase2AStar_Integrated : MonoBehaviour {
     public float w;
     public int h; //heuristic number
     Stopwatch stopwatch = new Stopwatch();
-
+    int maxMem;
     int numNodes;
-
+    float pathCost;
     //path that A* follows
     //array list of vectors where path passes through
     public ArrayList path = new ArrayList();
@@ -40,15 +40,16 @@ public class Phase2AStar_Integrated : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
+        maxMem = 0;
         numNodes = 0;
         proc = Process.GetCurrentProcess();
         mem = proc.PrivateMemorySize64;
 
         //set weight of A*
         //f=g+wh
-        w = 1f; //weight
-        h = 1; //heuristic
-        w2 = 1f;
+        //w = 2.5f; //weight
+        //h = 1; //heuristic
+        //w2 = 1.25f;
 
         n = 4; //num heuristics minus 1
         OPEN = new PriorityQueue[n + 1];
@@ -97,13 +98,13 @@ public class Phase2AStar_Integrated : MonoBehaviour {
                 }
                 path.Add(curr);
                 stopwatch.Stop();
-                UnityEngine.Debug.Log("stopwatch:" + stopwatch.ElapsedMilliseconds);
-                UnityEngine.Debug.Log("pathSize:" + path.Count);
-                UnityEngine.Debug.Log("numNodes:" + numNodes);
+                //UnityEngine.Debug.Log("stopwatch:" + stopwatch.ElapsedMilliseconds);
+                //UnityEngine.Debug.Log("pathSize:" + path.Count);
+                //UnityEngine.Debug.Log("numNodes:" + numNodes);
                 //mem = proc.PrivateMemorySize64;
 
                 //UnityEngine.Debug.Log("mem:" + mem);
-                UnityEngine.Debug.Log("visualizing");
+                //UnityEngine.Debug.Log("visualizing");
                 visualizeResetPaths();
             }
         }
@@ -186,6 +187,172 @@ public class Phase2AStar_Integrated : MonoBehaviour {
 
 
     //For Part 3
+
+    public float[] calculateAllPathsAStar(float[] results)
+    {
+
+        numNodes = 0;
+        proc = Process.GetCurrentProcess();
+        mem = proc.PrivateMemorySize64;
+
+        //set weight of A*
+        //f=g+wh
+        //w = 2.5f; //weight
+        //h = 1; //heuristic
+        //w2 = 1.25f;
+
+        n = 4; //num heuristics minus 1
+        OPEN = new PriorityQueue[n + 1];
+        CLOSED = new PriorityQueue[n + 1];
+
+        //temporary pathobject in path
+        tempPathObjs = new ArrayList();
+
+        //UnityEngine.Debug.Log("computing astar path---------------------------");
+        long stopWatchSumw1w1 = 0;
+        int pathCountSumw1w1 = 0;
+        int numNodesSumw1w1 = 0;
+        float pathCostSumw1w1 = 0;
+
+        long stopWatchSumw1w2 = 0;
+        int pathCountSumw1w2 = 0;
+        int numNodesSumw1w2 = 0;
+        float pathCostSumw1w2 = 0;
+
+        long stopWatchSumw2w1 = 0;
+        int pathCountSumw2w1 = 0;
+        int numNodesSumw2w1 = 0;
+        float pathCostSumw2w1 = 0;
+
+        long stopWatchSumw2w2 = 0;
+        int pathCountSumw2w2 = 0;
+        int numNodesSumw2w2 = 0;
+        float pathCostSumw2w2 = 0;
+
+
+
+
+        w = 1.5f;
+        w2 = 1.25f;
+        calculateAStar();
+        stopWatchSumw1w1 += stopwatch.ElapsedMilliseconds;
+        pathCountSumw1w1 += path.Count;
+        numNodesSumw1w1 += numNodes;
+        pathCostSumw1w1 += pathCost;
+        // UnityEngine.Debug.Log("Integrated. w1=1.5, w2=1.25. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("Integrated. w1=1.5, w2=1.25. memory: " + maxMem);
+        //UnityEngine.Debug.Log("Integrated. w1=1.5, w2=1.25. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("Integrated. w1=1.5, w2=1.25. path cost: " + pathCost);
+        results[60] = stopwatch.ElapsedMilliseconds;
+        results[61] = maxMem;
+        results[62] = numNodes;
+        results[63] = pathCost;
+
+        w = 1.5f;
+        w2 = 2f;
+        calculateAStar();
+        stopWatchSumw1w2 += stopwatch.ElapsedMilliseconds;
+        pathCountSumw1w2 += path.Count;
+        numNodesSumw1w2 += numNodes;
+        pathCostSumw1w2 += pathCost;
+        //UnityEngine.Debug.Log("Integrated. w1=1.5, w2=2. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("Integrated. w1=1.5, w2=2. memory: " + maxMem);
+        //UnityEngine.Debug.Log("Integrated. w1=1.5, w2=2. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("Integrated. w1=1.5, w2=2. path cost: " + pathCost);
+        results[64] = stopwatch.ElapsedMilliseconds;
+        results[65] = maxMem;
+        results[66] = numNodes;
+        results[67] = pathCost;
+
+
+        w = 2.5f;
+        w2 = 1.25f;
+        calculateAStar();
+        stopWatchSumw2w1 += stopwatch.ElapsedMilliseconds;
+        pathCountSumw2w1 += path.Count;
+        numNodesSumw2w1 += numNodes;
+        pathCostSumw2w1 += pathCost;
+        //UnityEngine.Debug.Log("Integrated. w1=2.5, w2=1.25. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("Integrated. w1=2.5, w2=1.25. memory: " + maxMem);
+        //UnityEngine.Debug.Log("Integrated. w1=2.5, w2=1.25. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("Integrated. w1=2.5, w2=1.25. path cost: " + pathCost);
+        results[68] = stopwatch.ElapsedMilliseconds;
+        results[69] = maxMem;
+        results[70] = numNodes;
+        results[71] = pathCost;
+
+        w = 2.5f;
+        w2 = 2f;
+        calculateAStar();
+        stopWatchSumw2w2 += stopwatch.ElapsedMilliseconds;
+        pathCountSumw2w2 += path.Count;
+        numNodesSumw2w2 += numNodes;
+        pathCostSumw2w2 += pathCost;
+        //UnityEngine.Debug.Log("Integrated. w1=2.5, w2=2. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("Integrated. w1=2.5, w2=2. memory: " + maxMem);
+        //UnityEngine.Debug.Log("Integrated. w1=2.5, w2=2. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("Integrated. w1=2.5, w2=2. path cost: " + pathCost);
+        results[72] = stopwatch.ElapsedMilliseconds;
+        results[73] = maxMem;
+        results[74] = numNodes;
+        results[75] = pathCost;
+
+        return results;
+    }
+
+    void calculateAStar()
+    {
+        maxMem = 0;
+        pathCost = 0;
+        numNodes = 0;
+        stopwatch.Reset();
+        stopwatch.Start();
+        path = new ArrayList();
+
+
+        OPEN = new PriorityQueue[n + 1];
+        CLOSED = new PriorityQueue[n + 1];
+        CLOSED_anchor = new PriorityQueue();
+        CLOSED_inad = new PriorityQueue();
+
+
+        //compute A*
+        mapSquare[,] map1 = transform.gameObject.GetComponent<loadMap>().map;
+        mapSquare[,] map2 = transform.gameObject.GetComponent<makeMap>().map;
+        if (map1 != null)
+        {
+            map = map1;
+            startLocation = transform.gameObject.GetComponent<loadMap>().startLocation;
+            goalLocation = transform.gameObject.GetComponent<loadMap>().goalLocation;
+            centers = transform.gameObject.GetComponent<loadMap>().centers;
+        }
+        else
+        {
+            map = map2;
+            startLocation = transform.gameObject.GetComponent<makeMap>().startLocation;
+            goalLocation = transform.gameObject.GetComponent<makeMap>().goalLocation;
+            centers = transform.gameObject.GetComponent<makeMap>().centerPartiallyBlocked;
+        }
+        if (integratedAStar())
+        {
+            Vector2 curr = goalLocation;
+            pathCost = map[(int)curr.x, (int)curr.y].g;
+            while (curr != startLocation)
+            {
+                path.Add(curr);
+                curr = map[(int)curr.x, (int)curr.y].parent;
+            }
+            path.Add(curr);
+            stopwatch.Stop();
+
+            //mem = proc.PrivateMemorySize64;
+
+            //UnityEngine.Debug.Log("mem:" + mem);
+
+            //visualizeResetPaths();
+        }
+    }
+
     bool integratedAStar()
     {
         //g(s_start) = 0;
@@ -205,6 +372,10 @@ public class Phase2AStar_Integrated : MonoBehaviour {
             OPEN[i] = new PriorityQueue();
             //Insert s_start in Open_i with priority = key(s_start,i)
             OPEN[i].Insert(startLocation, Key(startLocation, i));
+            if (OPEN[i].getSize() > maxMem)
+            {
+                maxMem = OPEN[i].getSize();
+            }
         }
 
         //initialized CLOSED_anchor
@@ -231,9 +402,14 @@ public class Phase2AStar_Integrated : MonoBehaviour {
                         }
                     }else
                     {
+                        numNodes++;
                         Vector2 s = OPEN[i].Pop();
                         ExpandState(s);
                         CLOSED_inad.Insert(s, Key(s, i));
+                        if (CLOSED_inad.getSize() > maxMem)
+                        {
+                            maxMem = CLOSED_inad.getSize();
+                        }
                     }
                 }else
                 {
@@ -247,9 +423,14 @@ public class Phase2AStar_Integrated : MonoBehaviour {
                         }
                     }else
                     {
+                        numNodes++;
                         Vector2 s = OPEN[0].Pop();
                         ExpandState(s);
                         CLOSED_anchor.Insert(s, Key(s, 0));
+                        if (CLOSED_anchor.getSize() > maxMem)
+                        {
+                            maxMem = CLOSED_anchor.getSize();
+                        }
                     }
                 }
             }
@@ -267,11 +448,11 @@ public class Phase2AStar_Integrated : MonoBehaviour {
         switch (i)
         {
             case 0:
-                return g(s) + w * h1(s, goalLocation);
-            case 1:
-                return g(s) + w * h2(s, goalLocation);
-            case 2:
                 return g(s) + w * h3(s, goalLocation);
+            case 1:
+                return g(s) + w * h1(s, goalLocation);
+            case 2:
+                return g(s) + w * h2(s, goalLocation);
             case 3:
                 return g(s) + w * h4(s, goalLocation);
             default:
@@ -332,6 +513,10 @@ public class Phase2AStar_Integrated : MonoBehaviour {
                             {
                                 //Insert s' in OPEN[0] with Key(s',0)
                                 OPEN[0].Insert(curr, Key(curr, 0));
+                                if (OPEN[0].getSize() > maxMem)
+                                {
+                                    maxMem = OPEN[0].getSize();
+                                }
                                 if (!CLOSED_inad.contains(curr))
                                 {
                                     for(int i=1; i<=n; i++)
@@ -339,6 +524,10 @@ public class Phase2AStar_Integrated : MonoBehaviour {
                                         if(Key(curr, i) <= w2 * Key(curr, 0))
                                         {
                                             OPEN[i].Insert(curr, Key(curr, i));
+                                            if (OPEN[i].getSize() > maxMem)
+                                            {
+                                                maxMem = OPEN[i].getSize();
+                                            }
                                         }
                                     }
                                 }

@@ -15,7 +15,8 @@ public class AStarAlgorithm : MonoBehaviour {
     public float w;
 	public int h; //heuristic number
     Stopwatch stopwatch = new Stopwatch();
-
+    float pathCost;
+    int maxMem;
     int numNodes;
 
     //path that A* follows
@@ -26,7 +27,7 @@ public class AStarAlgorithm : MonoBehaviour {
 
     public PriorityQueue fringe = new PriorityQueue();
     public PriorityQueue closed = new PriorityQueue();
-	public float w2; //secondary heuristic value
+	
 
 	//FOR SEQUENTIAL A*
 	public int n;
@@ -44,9 +45,9 @@ public class AStarAlgorithm : MonoBehaviour {
 
         //set weight of A*
         //f=g+wh
-        w = 1f; //weight
-		h = 1; //heuristic
-		w2 = 1f;
+        //w = 2.5f; //weight
+		//h = 1; //heuristic
+		
 
 		n=4; //num heuristics minus 1
 		OPEN = new PriorityQueue[n];
@@ -54,54 +55,328 @@ public class AStarAlgorithm : MonoBehaviour {
 
         //temporary pathobject in path
         tempPathObjs = new ArrayList();
+        
+
+
     }
 	
-	// Update is called once per frame
-	void Update () {
+    public float[] calculateAllPathsAStar(float[] results)
+    {
+        UnityEngine.Debug.Log("computing astar path---------------------------");
+        long stopWatchSumw0h3 = 0;
+        int pathCountSumw0h3 = 0;
+        int numNodesSumw0h3 = 0;
+        float pathCostSumw0h3 = 0;
+
+        float pathCostSumw1_5h1 = 0;
+        long stopWatchSumw1_5h1 = 0;
+        int pathCountSumw1_5h1 = 0;
+        int numNodesSumw1_5h1 = 0;
+
+        float pathCostSumw2_5h1 = 0;
+        long stopWatchSumw2_5h1 = 0;
+        int pathCountSumw2_5h1 = 0;
+        int numNodesSumw2_5h1 = 0;
+
+        float pathCostSumw1_5h2 = 0;
+        long stopWatchSumw1_5h2 = 0;
+        int pathCountSumw1_5h2 = 0;
+        int numNodesSumw1_5h2 = 0;
+
+        float pathCostSumw2_5h2 = 0;
+        long stopWatchSumw2_5h2 = 0;
+        int pathCountSumw2_5h2 = 0;
+        int numNodesSumw2_5h2 = 0;
+
+        float pathCostSumw1_5h3 = 0;
+        long stopWatchSumw1_5h3 = 0;
+        int pathCountSumw1_5h3 = 0;
+        int numNodesSumw1_5h3 = 0;
+
+        float pathCostSumw2_5h3 = 0;
+        long stopWatchSumw2_5h3 = 0;
+        int pathCountSumw2_5h3 = 0;
+        int numNodesSumw2_5h3 = 0;
+
+        float pathCostSumw1_5h4 = 0;
+        long stopWatchSumw1_5h4 = 0;
+        int pathCountSumw1_5h4 = 0;
+        int numNodesSumw1_5h4 = 0;
+
+        float pathCostSumw2_5h4 = 0;
+        long stopWatchSumw2_5h4 = 0;
+        int pathCountSumw2_5h4 = 0;
+        int numNodesSumw2_5h4 = 0;
+
+        float pathCostSumw1_5h5 = 0;
+        long stopWatchSumw1_5h5 = 0;
+        int pathCountSumw1_5h5 = 0;
+        int numNodesSumw1_5h5 = 0;
+
+        float pathCostSumw2_5h5 = 0;
+        long stopWatchSumw2_5h5 = 0;
+        int pathCountSumw2_5h5 = 0;
+        int numNodesSumw2_5h5 = 0;
+
+      
+
+
+
+
+            w = 0;
+            h = 3;
+        //Profiler.BeginSample("AStarAlgorithm");
+            calculateAStar();
+        //Profiler.EndSample();
+
+            stopWatchSumw0h3 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw0h3 += path.Count;
+            numNodesSumw0h3 += numNodes;
+            pathCostSumw0h3 += pathCost;
+        //     UnityEngine.Debug.Log("w=0, h=3. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=0, h=3. memory: " + maxMem);
+        //UnityEngine.Debug.Log("w=0, h=3. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=0, h=3. path cost: " + pathCost);
+
+        results[0] = stopwatch.ElapsedMilliseconds;
+        results[1] = maxMem;
+        results[2] = numNodes;
+        results[3] = pathCost;
+
+
+        w = 1.5f;
+            h = 1;
+            calculateAStar();
+            stopWatchSumw1_5h1 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw1_5h1 += path.Count;
+            numNodesSumw1_5h1 += numNodes;
+            pathCostSumw1_5h1 += pathCost;
+        //    UnityEngine.Debug.Log("w=1.5, h=1. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=1.5, h=1. memory: " + maxMem);
+        //UnityEngine.Debug.Log("w=1.5, h=1. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=1.5, h=1. path cost: " + pathCost);
+        results[4] = stopwatch.ElapsedMilliseconds;
+        results[5] = maxMem;
+        results[6] = numNodes;
+        results[7] = pathCost;
+
+
+        w = 2.5f;
+            h = 1;
+            calculateAStar();
+            stopWatchSumw2_5h1 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw2_5h1 += path.Count;
+            numNodesSumw2_5h1 += numNodes;
+            pathCostSumw2_5h1 += pathCost;
+        //    UnityEngine.Debug.Log("w=2.5, h=1. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=2.5, h=1. memory: " + maxMem);
+        //UnityEngine.Debug.Log("w=2.5, h=1. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=2.5, h=1. path cost: " + pathCost);
+        results[8] = stopwatch.ElapsedMilliseconds;
+        results[9] = maxMem;
+        results[10] = numNodes;
+        results[11] = pathCost;
+
+
+        w = 1.5f;
+            h = 2;
+            calculateAStar();
+            stopWatchSumw1_5h2 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw1_5h2 += path.Count;
+            numNodesSumw1_5h2 += numNodes;
+            pathCostSumw1_5h2 += pathCost;
+        //    UnityEngine.Debug.Log("w=1.5, h=2. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=1.5, h=2. memory: " + maxMem);
+        //UnityEngine.Debug.Log("w=1.5, h=2. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=1.5, h=2. path cost: " + pathCost);
+        results[12] = stopwatch.ElapsedMilliseconds;
+        results[13] = maxMem;
+        results[14] = numNodes;
+        results[15] = pathCost;
+
+
+        w = 2.5f;
+            h = 2;
+            calculateAStar();
+            stopWatchSumw2_5h2 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw2_5h2 += path.Count;
+            numNodesSumw2_5h2 += numNodes;
+            pathCostSumw2_5h2 += pathCost;
+        //    UnityEngine.Debug.Log("w=2.5, h=2. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=2.5, h=2. memory: " + maxMem);
+        //UnityEngine.Debug.Log("w=2.5, h=2. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=2.5, h=2. path cost: " + pathCost);
+        results[16] = stopwatch.ElapsedMilliseconds;
+        results[17] = maxMem;
+        results[18] = numNodes;
+        results[19] = pathCost;
+
+
+        w = 1.5f;
+            h = 3;
+            calculateAStar();
+            stopWatchSumw1_5h3 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw1_5h3 += path.Count;
+            numNodesSumw1_5h3 += numNodes;
+            pathCostSumw1_5h3 += pathCost;
+        //    UnityEngine.Debug.Log("w=1.5, h=3. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=1.5, h=3. memory: " + maxMem);
+        //UnityEngine.Debug.Log("w=1.5, h=3. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=1.5, h=3. path cost: " + pathCost);
+        results[20] = stopwatch.ElapsedMilliseconds;
+        results[21] = maxMem;
+        results[22] = numNodes;
+        results[23] = pathCost;
+
+
+        w = 2.5f;
+            h = 3;
+            calculateAStar();
+            stopWatchSumw2_5h3 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw2_5h3 += path.Count;
+            numNodesSumw2_5h3 += numNodes;
+            pathCostSumw2_5h3 += pathCost;
+        //    UnityEngine.Debug.Log("w=2.5, h=3. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=2.5, h=3. memory: " + maxMem);
+        //UnityEngine.Debug.Log("w=2.5, h=3. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=2.5, h=3. path cost: " + pathCost);
+        results[24] = stopwatch.ElapsedMilliseconds;
+        results[25] = maxMem;
+        results[26] = numNodes;
+        results[27] = pathCost;
+
+
+        w = 1.5f;
+            h = 4;
+            calculateAStar();
+            stopWatchSumw1_5h4 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw1_5h4 += path.Count;
+            numNodesSumw1_5h4 += numNodes;
+            pathCostSumw1_5h4 += pathCost;
+        //   UnityEngine.Debug.Log("w=1.5, h=4. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=1.5, h=4. memory: " + maxMem);
+        //UnityEngine.Debug.Log("w=1.5, h=4. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=1.5, h=4. path cost: " + pathCost);
+        results[28] = stopwatch.ElapsedMilliseconds;
+        results[29] = maxMem;
+        results[30] = numNodes;
+        results[31] = pathCost;
+
+
+
+        w = 2.5f;
+            h = 4;
+            calculateAStar();
+            stopWatchSumw2_5h4 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw2_5h4 += path.Count;
+            numNodesSumw2_5h4 += numNodes;
+            pathCostSumw2_5h4 += pathCost;
+        //  UnityEngine.Debug.Log("w=2.5, h=4. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=2.5, h=4. memory: " + maxMem);
+        //UnityEngine.Debug.Log("w=2.5, h=4. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=2.5, h=4. path cost: " + pathCost);
+        results[32] = stopwatch.ElapsedMilliseconds;
+        results[33] = maxMem;
+        results[34] = numNodes;
+        results[35] = pathCost;
+
+
+        w = 1.5f;
+            h = 5;
+            calculateAStar();
+            stopWatchSumw1_5h5 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw1_5h5 += path.Count;
+            numNodesSumw1_5h5 += numNodes;
+            pathCostSumw1_5h5 += pathCost;
+        //  UnityEngine.Debug.Log("w=1.5, h=5. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=1.5, h=5. memory: " + maxMem);
+        //UnityEngine.Debug.Log("w=1.5, h=5. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=1.5, h=5. path cost: " + pathCost);
+        results[36] = stopwatch.ElapsedMilliseconds;
+        results[37] = maxMem;
+        results[38] = numNodes;
+        results[39] = pathCost;
+
+
+        w = 2.5f;
+            h = 5;
+            calculateAStar();
+            stopWatchSumw2_5h5 += stopwatch.ElapsedMilliseconds;
+            pathCountSumw2_5h5 += path.Count;
+            numNodesSumw2_5h5 += numNodes;
+            pathCostSumw2_5h5 += pathCost;
+        //  UnityEngine.Debug.Log("w=2.5, h=5. time: " + stopwatch.ElapsedMilliseconds);
+        //UnityEngine.Debug.Log("w=2.5, h=5. memory: " + maxMem);
+        //     UnityEngine.Debug.Log("w=2.5, h=5. number of nodes: " + numNodes);
+        //UnityEngine.Debug.Log("w=2.5, h=5. path cost: " + pathCost);
+        results[40] = stopwatch.ElapsedMilliseconds;
+        results[41] = maxMem;
+        results[42] = numNodes;
+        results[43] = pathCost;
+
+        return results;
+    }
+
+
+    // Update is called once per frame
+    void Update () {
         if (Input.GetKey(KeyCode.G))
         {
-            stopwatch.Start();
-            path = new ArrayList();
-            
+            calculateAStar();
+            //UnityEngine.Debug.Log("time: " + stopwatch.ElapsedMilliseconds);
+            //UnityEngine.Debug.Log("path size: " + path.Count);
+            //UnityEngine.Debug.Log("number of nodes expanded: " + numNodes);
+            //UnityEngine.Debug.Log("path cost: " + pathCost);
 
-            fringe = new PriorityQueue();
-            closed = new PriorityQueue();
-            //compute A*
-            mapSquare[,] map1 = transform.gameObject.GetComponent<loadMap>().map;
-            mapSquare[,] map2 = transform.gameObject.GetComponent<makeMap>().map;
-            if (map1 != null)
+        }
+    }
+
+    void calculateAStar()
+    {
+        maxMem = 0;
+        pathCost = 0;
+        numNodes = 0;
+        stopwatch.Reset();
+        stopwatch.Start();
+        path = new ArrayList();
+
+
+        fringe = new PriorityQueue();
+        closed = new PriorityQueue();
+        //compute A*
+        mapSquare[,] map1 = transform.gameObject.GetComponent<loadMap>().map;
+        mapSquare[,] map2 = transform.gameObject.GetComponent<makeMap>().map;
+        if (map1 != null)
+        {
+            map = map1;
+            startLocation = transform.gameObject.GetComponent<loadMap>().startLocation;
+            goalLocation = transform.gameObject.GetComponent<loadMap>().goalLocation;
+            centers = transform.gameObject.GetComponent<loadMap>().centers;
+        }
+        else
+        {
+            map = map2;
+            startLocation = transform.gameObject.GetComponent<makeMap>().startLocation;
+            goalLocation = transform.gameObject.GetComponent<makeMap>().goalLocation;
+            centers = transform.gameObject.GetComponent<makeMap>().centerPartiallyBlocked;
+        }
+        if (aStarComputation())
+        {
+            Vector2 curr = goalLocation;
+            pathCost = map[(int)curr.x, (int)curr.y].g;
+            while (curr != startLocation)
             {
-                map = map1;
-                startLocation = transform.gameObject.GetComponent<loadMap>().startLocation;
-                goalLocation = transform.gameObject.GetComponent<loadMap>().goalLocation;
-                centers= transform.gameObject.GetComponent<loadMap>().centers;
-            }
-            else
-            {
-                map = map2;
-                startLocation = transform.gameObject.GetComponent<makeMap>().startLocation;
-                goalLocation = transform.gameObject.GetComponent<makeMap>().goalLocation;
-                centers = transform.gameObject.GetComponent<makeMap>().centerPartiallyBlocked;
-            }
-            if(aStarComputation())
-            {
-                Vector2 curr = goalLocation;
-                while (curr != startLocation)
-                {
-                    path.Add(curr);
-                    curr = map[(int)curr.x, (int)curr.y].parent;
-                }
                 path.Add(curr);
-                stopwatch.Stop();
-                UnityEngine.Debug.Log("stopwatch:" + stopwatch.ElapsedMilliseconds);
-                UnityEngine.Debug.Log("pathSize:" + path.Count);
-                UnityEngine.Debug.Log("numNodes:" + numNodes);
-                //mem = proc.PrivateMemorySize64;
-                
-                //UnityEngine.Debug.Log("mem:" + mem);
-                UnityEngine.Debug.Log("visualizing");
-                visualizeResetPaths();
+                curr = map[(int)curr.x, (int)curr.y].parent;
             }
+            path.Add(curr);
+            stopwatch.Stop();
+            
+            //mem = proc.PrivateMemorySize64;
+
+            //UnityEngine.Debug.Log("mem:" + mem);
+           
+            visualizeResetPaths();
         }
     }
 
@@ -180,17 +455,41 @@ public class AStarAlgorithm : MonoBehaviour {
         return .25f * Vector2.Distance(s, g)+1/count;
     }
 
+    float findH(Vector2 s, Vector2 g)
+    {
+        switch (h)
+        {
+            case 2:
+                return h1(s, g);
+            case 3:
+                return h3(s, g);
+            case 4:
+                return h4(s, g);
+            case 5:
+                return h5(s, g);
+            default:
+                return h2(s, g);
+
+        }
+    }
+
+
     //computes A*
     bool aStarComputation()
     {
+       
         map[(int)startLocation.x, (int)startLocation.y].g = 0;
         map[(int)startLocation.x, (int)startLocation.y].parent = startLocation;
         path.Clear();
       
-        fringe.Insert(startLocation, g(startLocation) + w*h1(startLocation,goalLocation));
+        fringe.Insert(startLocation, g(startLocation) + w* findH(startLocation,goalLocation));
+        if (fringe.getSize() > maxMem)
+        {
+            maxMem = fringe.getSize();
+        }
 
         //...do all pseudocode here
-        while(!fringe.isEmpty())
+        while (!fringe.isEmpty())
         {
             numNodes++;
             Vector2 s = fringe.Pop();
@@ -198,9 +497,14 @@ public class AStarAlgorithm : MonoBehaviour {
             {
                 return true; //path found
             }
-            closed.Insert(s, g(s)+w*h1(s,goalLocation));
-           
-            for(int i=-1; i<=1; i++) {
+            closed.Insert(s, g(s)+w* findH(s,goalLocation));
+            if (closed.getSize() > maxMem)
+            {
+                maxMem = closed.getSize();
+            }
+
+
+            for (int i=-1; i<=1; i++) {
                 for(int j=-1; j<=1; j++) {
                     Vector2 curr = new Vector2(s.x + i, s.y + j);
                    
@@ -240,8 +544,13 @@ public class AStarAlgorithm : MonoBehaviour {
         {
             fringe.Remove(curr);
         }
-
-        fringe.Insert(curr, map[(int)curr.x, (int)curr.y].g + w*h1(curr,goalLocation));
+        map[(int)curr.x, (int)curr.y].f = map[(int)curr.x, (int)curr.y].g+w * findH(curr, goalLocation);
+        map[(int)curr.x, (int)curr.y].h = findH(curr, goalLocation);
+        fringe.Insert(curr, map[(int)curr.x, (int)curr.y].g + w* findH(curr,goalLocation));
+        if(fringe.getSize()> maxMem)
+        {
+            maxMem = fringe.getSize();
+        }
 
     }
 

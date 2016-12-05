@@ -1,0 +1,14 @@
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\Assembly-CSharp.dll
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\Assembly-CSharp.pdb
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\UnityEditor.dll
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\UnityEngine.Analytics.dll
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\UnityEngine.dll
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\UnityEngine.Networking.dll
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\UnityEngine.UI.dll
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\UnityEngine.xml
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\UnityEngine.UI.xml
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\UnityEngine.Networking.xml
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\UnityEngine.Analytics.xml
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_bin\Debug\UnityEditor.xml
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_obj\Debug\Assembly-CSharp.dll
+C:\Users\Maxim\Documents\GitHub\CS520\CS520\Temp\UnityVS_obj\Debug\Assembly-CSharp.pdb
