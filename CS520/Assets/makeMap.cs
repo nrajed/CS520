@@ -39,14 +39,35 @@ public class makeMap : MonoBehaviour {
     //see if n was already pressed
     int nOnce = 0;
     int numberAStar = 0;
-
+    int maxPathsDone;
 
     // Use this for initialization
     void Start () {
-        maxPath = 2;//100;
-        numRows = 5;//120;
-        numCols = 5;//160;
-        pathMax = 1;//20
+        int smallMap = 3;
+        if (smallMap == 1)
+        {
+            maxPath = 2;//100;
+            numRows = 5;//120;
+            numCols = 5;//160;
+            pathMax = 2;//20
+            maxPathsDone = 1;//4
+        }else if (smallMap == 2)
+        {
+            maxPath = 25;//100;
+            numRows = 30;//120;
+            numCols = 40;//160;
+            pathMax = 5;//20
+            maxPathsDone = 1;//4
+        }
+        else {
+            maxPath = 100;//100;
+            numRows = 120;//120;
+            numCols = 160;//160;
+            pathMax = 20;//20
+            maxPathsDone = 4;//4
+        }
+
+        
         numberAStar = 0;
     }
 
@@ -67,7 +88,7 @@ public class makeMap : MonoBehaviour {
         if (Input.GetKey(KeyCode.R))
         {
             generateStartGoal();
-            updateStarterGoalSquares(startLocation, goalLocation);
+            updateStarterGoalSquares(startLocation, goalLocation,0);
         }
         if (Input.GetKey(KeyCode.K))
         {
@@ -85,8 +106,11 @@ public class makeMap : MonoBehaviour {
             Phase2AStar_Sequential seqastar = this.gameObject.GetComponent<Phase2AStar_Sequential>();
             Phase2AStar_Integrated intastar = this.gameObject.GetComponent<Phase2AStar_Integrated>();
 
-            for (int i = 0; i < 10; i++)
+            int numIterations=10;
+
+            for (int i = 0; i < numIterations; i++)
             {
+                Debug.Log("running it for i: " + i + "th time");
                 results = new float[76];
                 //if (numberAStar == 0 || numberAStar == 3)
                 //{
@@ -94,21 +118,19 @@ public class makeMap : MonoBehaviour {
                 map = new mapSquare[numRows, numCols];
                 generateUnblocked();
                 generateStartGoal();
-                updateStarterGoalSquares(startLocation, goalLocation);
+                updateStarterGoalSquares(startLocation, goalLocation,0);
                 generatePartiallyBlocked();
                 generateHighwayPoints();
                 assignEachPointOnHighway();
                 generateBlocked();
                 //display squares
-               // displaySquares();
+                displaySquares();
                 //convert to text
                 convertToText();
-                numberAStar = 0;
+                //numberAStar = 0;
                 Debug.Log("We generated new map with start: " + startLocation + " and goal: " + goalLocation);
                 //}
 
-                //if (numberAStar == 0)
-                //{
                 Debug.Log("Weighted A*-------------------------------------------");
                 //start with weighted astar
                 astar.enabled = true;
@@ -116,13 +138,8 @@ public class makeMap : MonoBehaviour {
                 intastar.enabled = false;
 
                 results=astar.calculateAllPathsAStar(results);
-                for(int f = 0; f < 76; f++)
-                {
-                    allResults[f] = allResults[f]+results[f];
-                }
-                //}
-                //else if (numberAStar == 1)
-                //{
+                
+
                 Debug.Log("Sequential A*-------------------------------------------");
                 //sequential astar
                 astar.enabled = false;
@@ -130,13 +147,8 @@ public class makeMap : MonoBehaviour {
                 intastar.enabled = false;
 
                 results=seqastar.calculateAllPathsAStar(results);
-                for (int f = 0; f < 76; f++)
-                {
-                    allResults[f] = allResults[f] + results[f];
-                }
-                //}
-                //else if (numberAStar == 2)
-                //{
+                
+
                 Debug.Log("Integrated A*-------------------------------------------");
                 //integrated astar
                 astar.enabled = false;
@@ -148,8 +160,7 @@ public class makeMap : MonoBehaviour {
                 {
                     allResults[f] = allResults[f] + results[f];
                 }
-                //}
-                //numberAStar++;
+
 
                 
 
@@ -159,7 +170,7 @@ public class makeMap : MonoBehaviour {
 
             for (int f = 0; f < 76; f++)
             {
-                Debug.Log("result "+f +":"+ allResults[f]/10);
+                Debug.Log("result "+f +":"+ allResults[f]/ numIterations);
             }
 
         }    
@@ -177,19 +188,22 @@ public class makeMap : MonoBehaviour {
         //generate map
         generateUnblocked();
         //generateStartGoal();
-        //updateStarterGoalSquares(startLocation, goalLocation);
-        startLocation = new Vector2((int)Random.Range(0, 4), (int)Random.Range(0, 4));
+        
+        startLocation = new Vector2((int)Random.Range(0, numRows-1), (int)Random.Range(0, numCols-1));
+        updateStarterGoalSquares(startLocation, goalLocation,0);
+        goalObject.SetActive(false);
         generatePartiallyBlocked();
         generateHighwayPoints();
         assignEachPointOnHighway();
         generateBlocked();
     }
 
+    public GameObject path;
 
     //display all squares in unity
-    public void displaySquaresGround()
+    public void displaySquaresGround(Vector2[] locations, int numLocations, int height)
     {
-        //go through map and place the right squares in the right places
+               //go through map and place the right squares in the right places
         for (int r = 0; r < numRows; r++)
         {
             for (int c = 0; c < numCols; c++)
@@ -213,14 +227,24 @@ public class makeMap : MonoBehaviour {
                     partiallyBlockedSquare.SetActive(false);
                 }
                 //place highways
-                if (map[r, c].path == 1)
+               
+                if (map[r, c].typeHighway >=1)
                 {
-                    horizontalHighway.SetActive(true);
-                    Object temp = Instantiate(horizontalHighway, new Vector3(r, 0.5f, c), Quaternion.identity);
-                    horizontalHighway.SetActive(false);
+                    verticalHighway.SetActive(true);
+                    Object temp = Instantiate(verticalHighway, new Vector3(r, 0.5f, c), Quaternion.AngleAxis(90, Vector3.up));
+                    verticalHighway.SetActive(false);
                 }
-                
+
             }
+        }
+
+
+        for(int i = 0; i <numLocations; i++)
+        {
+            path.SetActive(true);
+            Object temp = Instantiate(path, new Vector3(locations[i].x, height, locations[i].y), Quaternion.identity);
+            path.SetActive(false);
+
         }
     }
 
@@ -390,7 +414,7 @@ public class makeMap : MonoBehaviour {
         //while we have not done all 4 paths
         int pathsDone = 0;
         int currentPathDone = 0;//1 done, 2 restart
-        while (pathsDone < 4)
+        while (pathsDone < maxPathsDone)
         {
             stoppingTime++;
             if (stoppingTime == 10000)
@@ -1354,12 +1378,14 @@ public class makeMap : MonoBehaviour {
     }
 
     //helper methods
-    public void updateStarterGoalSquares(Vector2 start, Vector2 goal)
+    public void updateStarterGoalSquares(Vector2 start, Vector2 goal, int height)
     {
         //map[(int)start.x, (int)start.y].start = 1;
         //map[(int)start.x, (int)start.y].goal = 1;
-        startObject.transform.position = new Vector3(start.x, 0, start.y);
-        goalObject.transform.position = new Vector3(goal.x, 0, goal.y);
+        startObject.transform.position = new Vector3(start.x, height, start.y);
+        goalObject.transform.position = new Vector3(goal.x, height, goal.y);
+        Debug.Log("End Location: " + goalObject.transform.position);
+        goalObject.SetActive(true);
         //convert to text
         convertToText();
     }

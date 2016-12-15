@@ -290,7 +290,7 @@ public class Phase2AStar_Sequential : MonoBehaviour {
         //temporary pathobject in path
         tempPathObjs = new ArrayList();
 
-        pathCost = 0;
+        //pathCost = 0;
         numNodes = 0;
         stopwatch.Reset();
         stopwatch.Start();
@@ -325,6 +325,7 @@ public class Phase2AStar_Sequential : MonoBehaviour {
                 //gs[]
             }
             //pathCost = map[(int)curr.x, (int)curr.y].g;
+            //pathCost = g(goalLocation, 0);
             while (curr != startLocation)
             {
                 path.Add(curr);
@@ -386,7 +387,8 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 					{
 						if ((float)(map[(int)goalLocation.x, (int)goalLocation.y].SequentialG[i]) < float.MaxValue)
 						{
-							return i;
+                            pathCost = g(goalLocation, i);
+                            return i;
 						}
 					}
 					else
@@ -394,9 +396,9 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 						Vector2 s = OPEN[i].Pop();
 						ExpandState(s, i);
 						CLOSED[i].Insert(s, Key(s, i));
-                        if (CLOSED[i].getSize() > maxMem)
+                        if (CLOSED[i].getSize()+ OPEN[i].getSize() > maxMem)
                         {
-                            maxMem = CLOSED[i].getSize();
+                            maxMem = CLOSED[i].getSize() + OPEN[i].getSize();
                         }
                     }
 				}
@@ -406,7 +408,8 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 					{
 						if (g(goalLocation,0) < float.MaxValue)
 						{
-							return 0;
+                            pathCost = g(goalLocation, 0);
+                            return 0;
 						}
 
 					}
@@ -415,9 +418,9 @@ public class Phase2AStar_Sequential : MonoBehaviour {
 						Vector2 s = OPEN[0].Pop();
 						ExpandState(s, 0);
 						CLOSED[0].Insert(s, Key(s, 0));
-                        if (CLOSED[0].getSize() > maxMem)
+                        if (CLOSED[0].getSize() + OPEN[0].getSize() > maxMem)
                         {
-                            maxMem = CLOSED[0].getSize();
+                            maxMem = CLOSED[0].getSize() + OPEN[0].getSize();
                         }
                     }
 				}

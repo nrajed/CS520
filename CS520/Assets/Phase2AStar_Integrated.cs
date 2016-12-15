@@ -336,7 +336,7 @@ public class Phase2AStar_Integrated : MonoBehaviour {
         if (integratedAStar())
         {
             Vector2 curr = goalLocation;
-            pathCost = map[(int)curr.x, (int)curr.y].g;
+            pathCost = g(goalLocation);//map[(int)curr.x, (int)curr.y].g;
             while (curr != startLocation)
             {
                 path.Add(curr);
